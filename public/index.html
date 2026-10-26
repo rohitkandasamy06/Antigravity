@@ -579,6 +579,55 @@
             </div>
             <button class="btn-primary" onclick="getForecast()"><i class="ri-sparkling-2-fill"></i> Generate Operations Forecast</button>
           </div>
+
+          <!-- ML Architecture & Training Evaluation Card -->
+          <div class="card mb-6 border border-cyan-500/30 bg-gradient-to-r from-slate-900/90 via-cyan-950/20 to-slate-900/90 shadow-[0_0_25px_rgba(0,229,255,0.08)]">
+            <div class="card-header flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-4">
+              <div class="card-title-group">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">Tier 1 Supervised ML</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">Tier 2 Groq GenAI</span>
+                </div>
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                  <i class="ri-cpu-line text-cyan-400"></i> Dual-Tier ML Forecasting & Telemetry Architecture
+                </h3>
+                <p class="card-desc text-xs text-slate-400">Supervised Gradient Boosting Regressor trained on 29,240 records with chronological cross-validation</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <a href="/reports/actual_vs_predicted.png" target="_blank" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+                  <i class="ri-line-chart-line"></i> Actual vs Predicted Plot
+                </a>
+                <a href="/reports/feature_importance.png" target="_blank" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+                  <i class="ri-bar-chart-grouped-line"></i> Feature Importance
+                </a>
+              </div>
+            </div>
+            <div class="card-body pt-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-white/5">
+                  <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block mb-1">Champion Algorithm</span>
+                  <div class="text-sm font-bold text-cyan-300">Gradient Boosting</div>
+                  <span class="text-[10px] text-slate-500">150 Estimators, lr=0.08</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-emerald-500/20">
+                  <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block mb-1">Validation R² Score</span>
+                  <div class="text-lg font-black text-emerald-400 font-mono">0.9270</div>
+                  <span class="text-[10px] text-emerald-500/80">92.7% Variance Explained</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-cyan-500/20">
+                  <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block mb-1">Validation RMSE / MAE</span>
+                  <div class="text-base font-bold text-cyan-300 font-mono">5.38 / 4.13 <span class="text-xs font-normal text-slate-400">units</span></div>
+                  <span class="text-[10px] text-slate-500">Test MAPE: 6.74%</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-white/5">
+                  <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block mb-1">Dataset Horizon</span>
+                  <div class="text-sm font-bold text-slate-200">29,240 Samples</div>
+                  <span class="text-[10px] text-slate-500">5 Global Hubs • 2 Years</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="card card-chart">
             <div class="card-header"><div class="card-title-group"><h3><i class="ri-funds-line"></i> Baseline Historical Sales Run Rate</h3><p class="card-desc">12-month automotive gross volume used for predictive inference</p></div></div>
             <div class="card-body chart-h300"><canvas id="forecastBaseChart"></canvas></div>
