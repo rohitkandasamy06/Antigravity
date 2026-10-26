@@ -529,7 +529,7 @@ async function checkStatus() {
 
     if (statusText && statusDot) {
       if (data.hasGroqKey) {
-        statusText.textContent = 'Groq Cloud Active';
+        statusText.textContent = `Groq LPU Active (${data.model || 'Connected'})`;
         statusDot.style.background = 'var(--green)';
       } else {
         statusText.textContent = 'Hybrid Telemetry Ready';
@@ -2026,7 +2026,7 @@ async function saveApiKey() {
     const data = await res.json();
 
     if (data.success) {
-      showKeyFeedback(data.message || 'Groq API Key verified! LLaMA 3.3 70B live inference active.', 'success');
+      showKeyFeedback(data.message || `Groq API Key verified! ${data.model || ''} live inference active.`, 'success');
       input.value = '';
       checkStatus();
       getQuickInsight();

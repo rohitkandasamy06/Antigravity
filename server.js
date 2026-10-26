@@ -10,15 +10,62 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── Groq Client Setup ─────────────────────────────────────────────────────────
+// ─── Groq Client Setup & Dynamic Model Resolution ────────────────────────────
 let currentApiKey = process.env.GROQ_API_KEY || '';
 let groq = null;
+let activeGroqModel = 'llama-3.3-70b-versatile';
+let fallbackGroqModels = [];
+
+const PREFERRED_GROQ_MODELS = [
+  'llama-3.3-70b-versatile',
+  'llama-3.1-70b-versatile',
+  'llama-3.1-8b-instant',
+  'llama3-70b-8192',
+  'llama3-8b-8192',
+  'qwen/qwen3.8-27b',
+  'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
+  'allam-2-7b'
+];
+
+async function resolveGroqModel(client) {
+  try {
+    const list = await client.models.list();
+    const availableChatModels = (list.data || []).filter(m => 
+      m.active &&
+      (!m.output_modalities || m.output_modalities.includes('text')) &&
+      !m.id.includes('whisper') &&
+      !m.id.includes('prompt-guard') &&
+      !m.id.includes('safeguard') &&
+      !m.id.includes('orpheus')
+    ).map(m => m.id);
+
+    console.log('Available Groq chat models for key:', availableChatModels);
+
+    const matched = PREFERRED_GROQ_MODELS.find(p => availableChatModels.includes(p));
+    const chosen = matched || availableChatModels[0] || 'qwen/qwen3.8-27b';
+    const fallbacks = availableChatModels.filter(m => m !== chosen);
+
+    return { chosen, fallbacks };
+  } catch (err) {
+    console.warn('Could not list models from Groq:', err.message);
+    return { chosen: 'llama-3.3-70b-versatile', fallbacks: ['qwen/qwen3.8-27b'] };
+  }
+}
 
 function initGroqClient(key) {
   if (key && key !== 'your_groq_api_key_here' && key.trim().length > 10) {
     try {
-      groq = new Groq({ apiKey: key.trim() });
+      const client = new Groq({ apiKey: key.trim() });
+      groq = client;
       currentApiKey = key.trim();
+      resolveGroqModel(client).then(({ chosen, fallbacks }) => {
+        activeGroqModel = chosen;
+        fallbackGroqModels = fallbacks;
+        console.log(`Groq initialized with active model: ${activeGroqModel}`);
+      }).catch(err => {
+        console.warn('Initial Groq model discovery warning:', err.message);
+      });
       return true;
     } catch (e) {
       console.error('Groq init failed:', e.message);
@@ -289,13 +336,13 @@ app.get('/api/status', (req, res) => {
   const isConfigured = Boolean(groq && currentApiKey && currentApiKey.trim().length > 10);
   res.json({
     hasGroqKey: isConfigured,
-    model: 'llama-3.3-70b-versatile',
+    model: activeGroqModel,
     maskedKey: currentApiKey && currentApiKey.length > 8 ? currentApiKey.slice(0, 7) + '...' + currentApiKey.slice(-4) : null,
-    source: isConfigured ? 'Groq Cloud (LLaMA 3.3 70B Active)' : 'Hybrid AI Engine (Demo Mode)'
+    source: isConfigured ? `Groq Cloud (${activeGroqModel} Active)` : 'Hybrid AI Engine (Demo Mode)'
   });
 });
 
-// Update Groq API Key dynamically with live test verification
+// Update Groq API Key dynamically with live test verification & auto-model detection
 app.post('/api/set-api-key', async (req, res) => {
   const { apiKey } = req.body;
   if (!apiKey || typeof apiKey !== 'string') {
@@ -308,17 +355,38 @@ app.post('/api/set-api-key', async (req, res) => {
   }
 
   try {
-    // Test key with live Groq completion
     const testClient = new Groq({ apiKey: trimmed });
-    await testClient.chat.completions.create({
-      messages: [{ role: 'user', content: 'Connection check' }],
-      model: 'llama-3.1-8b-instant',
-      max_tokens: 5
-    });
+    const { chosen, fallbacks } = await resolveGroqModel(testClient);
+
+    // Test key with live Groq completion on the detected model
+    let verifiedModel = chosen;
+    let verified = false;
+    const candidates = [chosen, ...fallbacks];
+
+    for (const modelCandidate of candidates) {
+      try {
+        await testClient.chat.completions.create({
+          messages: [{ role: 'user', content: 'Connection check' }],
+          model: modelCandidate,
+          max_tokens: 5
+        });
+        verifiedModel = modelCandidate;
+        verified = true;
+        break;
+      } catch (checkErr) {
+        console.warn(`Model ${modelCandidate} test failed: ${checkErr.message}`);
+      }
+    }
+
+    if (!verified) {
+      throw new Error('Unable to run completion with available models on this Groq account.');
+    }
 
     // Verification succeeded!
     groq = testClient;
     currentApiKey = trimmed;
+    activeGroqModel = verifiedModel;
+    fallbackGroqModels = fallbacks.filter(m => m !== verifiedModel);
 
     // Write to .env
     try {
@@ -330,9 +398,9 @@ app.post('/api/set-api-key', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Groq API Key verified! LLaMA 3.3 70B live inference activated.',
+      message: `Groq LPU verified! Active model: ${activeGroqModel}`,
       hasGroqKey: true,
-      model: 'llama-3.3-70b-versatile'
+      model: activeGroqModel
     });
   } catch (err) {
     console.error('Groq connection check failed:', err.message);
@@ -347,6 +415,8 @@ app.post('/api/set-api-key', async (req, res) => {
 app.post('/api/remove-api-key', (req, res) => {
   groq = null;
   currentApiKey = '';
+  activeGroqModel = 'llama-3.3-70b-versatile';
+  fallbackGroqModels = [];
   try {
     const envPath = path.join(__dirname, '.env');
     fs.writeFileSync(envPath, `GROQ_API_KEY=\nPORT=3000\n`, 'utf-8');
@@ -357,22 +427,23 @@ app.post('/api/remove-api-key', (req, res) => {
   });
 });
 
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
-const FALLBACK_GROQ_MODEL = 'llama-3.1-8b-instant';
-
 async function createGroqCompletion(options) {
-  try {
-    return await groq.chat.completions.create({
-      ...options,
-      model: GROQ_MODEL
-    });
-  } catch (err) {
-    console.warn(`Groq primary model failed (${err.message}), trying ${FALLBACK_GROQ_MODEL}...`);
-    return await groq.chat.completions.create({
-      ...options,
-      model: FALLBACK_GROQ_MODEL
-    });
+  const modelsToTry = [activeGroqModel, ...fallbackGroqModels];
+  const uniqueModels = [...new Set(modelsToTry.filter(Boolean))];
+
+  let lastError = null;
+  for (const model of uniqueModels) {
+    try {
+      return await groq.chat.completions.create({
+        ...options,
+        model
+      });
+    } catch (err) {
+      console.warn(`Groq model ${model} failed (${err.message}), trying next fallback...`);
+      lastError = err;
+    }
   }
+  throw lastError || new Error('All Groq models failed');
 }
 
 // AI Insights via Groq (with intelligent fallback)
@@ -402,7 +473,7 @@ Data Context:
 
       return res.json({
         insight: chatCompletion.choices[0]?.message?.content || generateFallbackInsights(),
-        model: GROQ_MODEL,
+        model: activeGroqModel,
         liveGroq: true
       });
     } catch (error) {
@@ -413,7 +484,7 @@ Data Context:
   // Graceful fallback with rich auto-parts insights
   res.json({
     insight: generateFallbackInsights(),
-    model: GROQ_MODEL,
+    model: activeGroqModel,
     liveGroq: false,
     note: currentApiKey === 'your_groq_api_key_here' || !currentApiKey ? 'Add your Groq API key in .env or the topbar to enable live LPU inference.' : undefined
   });
@@ -448,7 +519,7 @@ Be insightful, authoritative in automotive engineering & logistics, and concise 
 
       return res.json({
         reply: chatCompletion.choices[0]?.message?.content || generateFallbackChatReply(lastUserMsg),
-        model: GROQ_MODEL,
+        model: activeGroqModel,
         liveGroq: true
       });
     } catch (error) {
@@ -458,7 +529,7 @@ Be insightful, authoritative in automotive engineering & logistics, and concise 
 
   res.json({
     reply: generateFallbackChatReply(lastUserMsg),
-    model: GROQ_MODEL,
+    model: activeGroqModel,
     liveGroq: false
   });
 });
