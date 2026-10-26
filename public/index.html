@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ApexDrive — Performance Auto Parts & Operations Telemetry</title>
+  <meta name="description" content="Commercial automotive aftermarket parts, warehouse logistics, and performance telemetry dashboard powered by Groq LLaMA 3.3 70B." />
+  <link href="libs/remixicon/remixicon.css" rel="stylesheet" />
+  <script src="libs/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Tailwind CSS v3 (Offline Standalone Engine with motorsport theme tokens) -->
+  <script src="libs/tailwind.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'apex-cyan': '#00f2fe',
+            'apex-blue': '#3b82f6',
+            'apex-orange': '#ff6b00',
+            'apex-amber': '#ffb800',
+            'apex-green': '#00e676',
+            'apex-red': '#ff3366',
+            'apex-obsidian': '#07090e',
+            'apex-card': 'rgba(13, 18, 28, 0.85)'
+          },
+          fontFamily: {
+            sans: ['Outfit', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- ═══ Dynamic Thematic Background Stage ═══ -->
+  <div class="hero-bg-layer" id="heroBgLayer"></div>
+  <div class="hero-bg-overlay"></div>
+  <!-- ═══ Animated Background Particles ═══ -->
+  <canvas id="particleCanvas" class="particle-canvas"></canvas>
+  <div class="bg-aurora">
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
+    <div class="aurora-blob blob-4"></div>
+    <div class="aurora-blob blob-5"></div>
+  </div>
+  <div class="noise-overlay"></div>
+
+  <!-- ═══ PAGE: SPLASH / WELCOME ═══ -->
+  <div class="page page-splash active" id="page-splash">
+    <div class="splash-container">
+      <div class="splash-content">
+        <div class="splash-logo">
+          <div class="splash-logo-ring">
+            <div class="splash-logo-inner">
+              <i class="ri-roadster-fill"></i>
+            </div>
+          </div>
+        </div>
+        <h1 class="splash-title">APEX<span class="gradient-text">DRIVE</span></h1>
+        <p class="splash-tagline">Performance Auto Parts & Fleet Logistics Operations</p>
+        <div class="splash-features">
+          <div class="splash-feature">
+            <i class="ri-flashlight-line"></i>
+            <span>OEM & Performance Parts</span>
+          </div>
+          <div class="splash-feature">
+            <i class="ri-brain-line"></i>
+            <span>Groq LLaMA 3.3 70B AI</span>
+          </div>
+          <div class="splash-feature">
+            <i class="ri-truck-line"></i>
+            <span>5 Regional Distribution Hubs</span>
+          </div>
+        </div>
+        <button class="splash-enter-btn" onclick="enterDashboard()">
+          <span>Launch Operations Deck</span>
+          <i class="ri-arrow-right-line"></i>
+          <div class="btn-glow"></div>
+        </button>
+        <p class="splash-powered">Enterprise Telemetry Engine • Powered by <strong>Groq LLaMA 3.3 70B</strong> & <strong>Chart.js</strong></p>
+      </div>
+      <div class="splash-stats-orbit">
+        <div class="orbit-ring ring-1"></div>
+        <div class="orbit-ring ring-2"></div>
+        <div class="orbit-ring ring-3"></div>
+        <div class="orbit-dot dot-1"><i class="ri-speed-up-line"></i></div>
+        <div class="orbit-dot dot-2"><i class="ri-tools-fill"></i></div>
+        <div class="orbit-dot dot-3"><i class="ri-shield-check-fill"></i></div>
+        <div class="orbit-dot dot-4"><i class="ri-settings-4-fill"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: MAIN DASHBOARD ═══ -->
+  <div class="page page-dashboard" id="page-dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo" onclick="navigateTo('dashboard')">
+          <div class="logo-icon"><i class="ri-roadster-fill"></i></div>
+          <div class="logo-text">
+            <span class="logo-name">APEX<span class="gradient-text">DRIVE</span></span>
+            <span class="logo-subtitle">Auto Parts Operations</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">OPERATIONS</div>
+        <a href="#" class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard', this)">
+          <i class="ri-dashboard-3-line"></i><span>Overview Deck</span>
+        </a>
+        <a href="#" class="nav-item" data-page="revenue" onclick="navigateTo('revenue', this)">
+          <i class="ri-funds-box-line"></i><span>Fleet Revenue</span>
+        </a>
+        <a href="#" class="nav-item" data-page="products" onclick="navigateTo('products', this)">
+          <i class="ri-tools-line"></i><span>Parts Catalog</span>
+        </a>
+        <a href="#" class="nav-item" data-page="customers" onclick="navigateTo('customers', this)">
+          <i class="ri-building-4-line"></i><span>Garage Accounts</span>
+        </a>
+
+        <div class="nav-section-label">LOGISTICS & HUBS</div>
+        <a href="#" class="nav-item" data-page="regions" onclick="navigateTo('regions', this)">
+          <i class="ri-map-pin-2-line"></i><span>Hub Telemetry</span>
+        </a>
+        <a href="#" class="nav-item" data-page="stores" onclick="navigateTo('stores', this)">
+          <i class="ri-truck-line"></i><span>Warehouses</span>
+        </a>
+        <a href="#" class="nav-item" data-page="trends" onclick="navigateTo('trends', this)">
+          <i class="ri-pulse-line"></i><span>Intake Trends</span>
+        </a>
+
+        <div class="nav-section-label">CORPORATE & PORTAL</div>
+        <a href="#" class="nav-item" data-page="about" onclick="navigateTo('about', this)">
+          <i class="ri-information-line"></i><span>Who We Are</span>
+        </a>
+        <a href="#" class="nav-item" data-page="admin" onclick="navigateTo('admin', this)">
+          <i class="ri-shield-user-line"></i><span>Administration</span>
+        </a>
+        <a href="#" class="nav-item" data-page="trends-intel" onclick="navigateTo('trends-intel', this)">
+          <i class="ri-radar-line"></i><span>Business Trends</span>
+        </a>
+        <a href="#" class="nav-item" data-page="customer-behavior" onclick="navigateTo('customer-behavior', this)">
+          <i class="ri-user-star-line"></i><span>Customer Behaviour</span>
+        </a>
+
+        <div class="nav-section-label">AI INTELLIGENCE</div>
+        <a href="#" class="nav-item" data-page="ai-chat" onclick="navigateTo('ai-chat', this)">
+          <i class="ri-robot-2-line"></i><span>ApexGear AI</span>
+          <span class="nav-badge pulse">GROQ</span>
+        </a>
+        <a href="#" class="nav-item" data-page="forecast" onclick="navigateTo('forecast', this)">
+          <i class="ri-flashlight-line"></i><span>Demand Forecast</span>
+          <span class="nav-badge">NEW</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar"><i class="ri-user-settings-fill"></i></div>
+          <div class="user-info">
+            <span class="user-name">Vance, Marcus</span>
+            <span class="user-role">Operations VP</span>
+          </div>
+        </div>
+        <div class="ai-status" onclick="openKeyModal()" style="cursor: pointer" title="Configure Groq Cloud AI Engine">
+          <div class="ai-status-dot"></div>
+          <span>Groq AI Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="ri-menu-line"></i></button>
+          <div class="breadcrumb" id="breadcrumb">
+            <span class="breadcrumb-current">Overview Deck</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input type="text" id="topSearchInput" placeholder="Search SKU, Brembo, Turbo, Garrett..." oninput="handleGlobalSearch(this.value)" />
+          </div>
+          <button class="topbar-btn" onclick="openKeyModal()" title="Groq API Key Settings"><i class="ri-key-2-line"></i></button>
+          <button class="topbar-btn" onclick="refreshData()" title="Refresh Operations Telemetry"><i class="ri-refresh-line"></i></button>
+          <button class="topbar-btn notification-btn" id="notifBtn" onclick="toggleNotificationsDrawer()" title="Dispatch Alerts">
+            <i class="ri-notification-3-line"></i>
+            <span class="notification-dot" id="notifDot"></span>
+          </button>
+          <div class="topbar-date">
+            <i class="ri-calendar-line"></i>
+            <span id="currentDate"></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ═══ Operational Dispatch Alerts Dropdown / Drawer ═══ -->
+      <div class="notifications-drawer" id="notificationsDrawer">
+        <div class="notif-header">
+          <div class="notif-title-group">
+            <div class="notif-icon-badge"><i class="ri-notification-3-fill"></i></div>
+            <div>
+              <div class="notif-title">Operational Dispatch Alerts</div>
+              <div class="notif-subtitle">Live telemetry feeds across 5 regional hubs</div>
+            </div>
+          </div>
+          <div class="notif-actions">
+            <button class="notif-btn-clear" onclick="clearAllNotifications()">Clear All</button>
+            <button class="notif-btn-close" onclick="toggleNotificationsDrawer()"><i class="ri-close-line"></i></button>
+          </div>
+        </div>
+        <div class="notif-list" id="notificationsList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Page Container -->
+      <div class="page-container" id="pageContainer">
+
+        <!-- ═══════ 1. OVERVIEW DECK ═══════ -->
+        <div class="sub-page active" id="subpage-dashboard">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title"><i class="ri-roadster-fill"></i> Operations Overview Deck</h1>
+              <p class="page-desc">Real-time aftermarket sales, fulfillment speeds, and supply chain telemetry across 5 regional hubs.</p>
+            </div>
+            <div class="header-actions">
+              <select class="period-select" id="periodSelect">
+                <option>FY 2026 Fiscal Year</option>
+                <option>Q4 Peak Tuning Season</option>
+                <option>Last 30 Days (Rolling)</option>
+                <option>Last 7 Days (Sprint)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- KPI Row -->
+          <div class="kpi-grid" id="kpiGrid"></div>
+
+          <!-- Quick Charts -->
+          <div class="grid-2">
+            <div class="card card-chart clickable" onclick="navigateTo('revenue')">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3><i class="ri-line-chart-line"></i> Annual Revenue Run Rate</h3>
+                  <p class="card-desc">Monthly automotive gross sales vs prior year</p>
+                </div>
+                <span class="card-link">Deep Analytics <i class="ri-arrow-right-s-line"></i></span>
+              </div>
+              <div class="card-body chart-h300"><canvas id="revenueChart"></canvas></div>
+            </div>
+            <div class="card card-chart clickable" onclick="navigateTo('products')">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3><i class="ri-pie-chart-line"></i> Auto Category Volume Split</h3>
+                  <p class="card-desc">Braking, Turbo, Suspension, Wheels & Fluids</p>
+                </div>
+                <span class="card-link">View Parts <i class="ri-arrow-right-s-line"></i></span>
+              </div>
+              <div class="card-body chart-h300"><canvas id="categoryChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div class="card card-chart clickable" onclick="navigateTo('trends')">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3><i class="ri-time-line"></i> Hourly Order Intake Heatmap</h3>
+                  <p class="card-desc">Commercial garage dispatch spikes</p>
+                </div>
+                <span class="card-link">Details <i class="ri-arrow-right-s-line"></i></span>
+              </div>
+              <div class="card-body chart-h250"><canvas id="trafficChart"></canvas></div>
+            </div>
+            <div class="card card-chart clickable span-2" onclick="navigateTo('stores')">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3><i class="ri-truck-line"></i> Warehouse Logistics Hubs</h3>
+                  <p class="card-desc">Revenue throughput & commercial delivery rate</p>
+                </div>
+                <span class="card-link">All 5 Hubs <i class="ri-arrow-right-s-line"></i></span>
+              </div>
+              <div class="card-body chart-h250"><canvas id="storeChartHome"></canvas></div>
+            </div>
+          </div>
+
+          <!-- AI Quick Insight -->
+          <div class="card card-ai-insight clickable" onclick="navigateTo('ai-chat')">
+            <div class="ai-insight-glow"></div>
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3><i class="ri-sparkling-2-fill"></i> ApexGear AI — Real-time Fleet Telemetry Insights</h3>
+                <p class="card-desc">Powered by Groq Cloud — LLaMA 3.3 70B High-Velocity Engine</p>
+              </div>
+              <div class="ai-actions">
+                <button class="btn-ghost" onclick="event.stopPropagation(); getQuickInsight()"><i class="ri-refresh-line"></i> Re-Analyze</button>
+                <span class="card-link">Open ApexGear Chat <i class="ri-arrow-right-s-line"></i></span>
+              </div>
+            </div>
+            <div class="card-body" id="quickInsightText">
+              <div class="loading-shimmer"><i class="ri-sparkling-fill"></i> Generating actionable insights with Groq...</div>
+            </div>
+          </div>
+
+          <!-- Top High-Velocity SKUs Preview -->
+          <div class="card clickable" onclick="navigateTo('products')">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3><i class="ri-trophy-line"></i> Top-Grossing Automotive SKUs</h3>
+                <p class="card-desc">Leading performance parts ranked by wholesale & retail revenue</p>
+              </div>
+              <span class="card-link">Open Parts Catalog <i class="ri-arrow-right-s-line"></i></span>
+            </div>
+            <div class="card-body">
+              <div class="top-products-preview" id="topProductsPreview"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 2. REVENUE ANALYTICS ═══════ -->
+        <div class="sub-page" id="subpage-revenue">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-funds-box-line"></i> Automotive Revenue Analytics</h1>
+              <p class="page-desc">Detailed annual run rates, monthly trajectory comparisons, and category margin analysis</p>
+            </div>
+          </div>
+          <div class="kpi-grid kpi-grid-3" id="revenueKpis"></div>
+          <div class="grid-1">
+            <div class="card card-chart">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3><i class="ri-funds-line"></i> Historical & Run-Rate Revenue Curve</h3>
+                  <p class="card-desc">Current fiscal trajectory vs previous year</p>
+                </div>
+                <div class="toggle-group">
+                  <button class="toggle-btn active" onclick="setRevenueView('monthly', this)">Monthly View</button>
+                  <button class="toggle-btn" onclick="setRevenueView('cumulative', this)">Cumulative Gross</button>
+                </div>
+              </div>
+              <div class="card-body chart-h400"><canvas id="revenueDetailChart"></canvas></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-calendar-check-line"></i> 30-Day Daily Dispatch Sales</h3><p class="card-desc">Daily invoicing and wholesale parts order volume</p></div></div>
+              <div class="card-body chart-h300"><canvas id="dailySalesChart"></canvas></div>
+            </div>
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-bar-chart-horizontal-line"></i> Revenue Contribution by Category</h3><p class="card-desc">Braking, Powertrain, Suspension & Racing Fluids</p></div></div>
+              <div class="card-body chart-h300"><canvas id="revenueByCatChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 3. PARTS CATALOG & LEADERBOARD ═══════ -->
+        <div class="sub-page" id="subpage-products">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-tools-line"></i> Parts Catalog & SKU Leaderboard</h1>
+              <p class="page-desc">Comprehensive SKU breakdown, OEM vehicle fitments, warranty RMA rates, and stock availability</p>
+            </div>
+            <div class="header-actions">
+              <div class="toggle-group">
+                <button class="toggle-btn active" onclick="sortProducts('revenue', this)">By Gross Revenue</button>
+                <button class="toggle-btn" onclick="sortProducts('units', this)">By Units Dispatched</button>
+                <button class="toggle-btn" onclick="sortProducts('stock', this)">By Stock Volume</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category filter tabs -->
+          <div class="table-filter-bar">
+            <div class="category-pills" id="categoryPillContainer">
+              <button class="cat-pill active" onclick="filterCatalogCategory('All', this)">All Categories</button>
+              <button class="cat-pill" onclick="filterCatalogCategory('Braking & Rotors', this)">Braking & Rotors</button>
+              <button class="cat-pill" onclick="filterCatalogCategory('Turbo & Powertrain', this)">Turbo & Powertrain</button>
+              <button class="cat-pill" onclick="filterCatalogCategory('Suspension & Steering', this)">Suspension & Steering</button>
+              <button class="cat-pill" onclick="filterCatalogCategory('Electrical & Ignition', this)">Electrical & Ignition</button>
+              <button class="cat-pill" onclick="filterCatalogCategory('Wheels & Track Tires', this)">Wheels & Tires</button>
+              <button class="cat-pill" onclick="filterCatalogCategory('Performance Exhausts', this)">Exhausts</button>
+              <button class="cat-pill" onclick="filterCatalogCategory('Fluids & Race Lubricants', this)">Racing Fluids</button>
+              <button class="cat-pill" onclick="filterCatalogCategory('Engine Internals', this)">Engine Internals</button>
+            </div>
+            <div class="search-box">
+              <i class="ri-search-line"></i>
+              <input type="text" id="catalogSearchInput" placeholder="Filter by SKU, Brembo, Turbo..." oninput="handleCatalogSearch(this.value)" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-donut-chart-line"></i> Parts Volume by Category</h3></div></div>
+              <div class="card-body chart-h300"><canvas id="productCatChart"></canvas></div>
+            </div>
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-bubble-chart-line"></i> Category Growth vs Profit Margin</h3><p class="card-desc">Bubble size corresponds to annual revenue volume</p></div></div>
+              <div class="card-body chart-h300"><canvas id="scatterChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3><i class="ri-trophy-line"></i> Complete Performance Auto Parts Leaderboard</h3>
+                <p class="card-desc">18 premium SKUs with manufacturer brand, vehicle compatibility, and return rates</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table class="data-table" id="productsTable">
+                  <thead>
+                    <tr>
+                      <th># Rank</th>
+                      <th>SKU & Part Description</th>
+                      <th>Category & Brand</th>
+                      <th>Vehicle Fitment</th>
+                      <th>Gross Revenue</th>
+                      <th>Units Sold</th>
+                      <th>Stock Status</th>
+                      <th>RMA Warranty</th>
+                      <th>Volume Share</th>
+                    </tr>
+                  </thead>
+                  <tbody id="productsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 4. COMMERCIAL ACCOUNTS & FLEETS ═══════ -->
+        <div class="sub-page" id="subpage-customers">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-building-4-line"></i> Commercial Garage & Fleet Accounts</h1>
+              <p class="page-desc">B2B Dealership networks, pro-tuner speedshops, and commercial fleet maintenance contracts</p>
+            </div>
+          </div>
+          <div class="kpi-grid kpi-grid-4" id="customerKpis"></div>
+          <div class="card">
+            <div class="card-header"><div class="card-title-group"><h3><i class="ri-group-line"></i> Customer & Fleet Segments</h3><p class="card-desc">Commercial account breakdown by lifetime value and ordering frequency</p></div></div>
+            <div class="card-body">
+              <div class="segments-grid" id="segmentsGrid"></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-pie-chart-2-line"></i> Account Cohort Distribution</h3></div></div>
+              <div class="card-body chart-h300"><canvas id="segmentPieChart"></canvas></div>
+            </div>
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-bar-chart-2-line"></i> Revenue Contribution by Account Tier</h3></div></div>
+              <div class="card-body chart-h300"><canvas id="segmentBarChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 5. DISTRIBUTION HUBS & REGIONS ═══════ -->
+        <div class="sub-page" id="subpage-regions">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-map-pin-2-line"></i> Distribution Hub Logistics & Telemetry</h1>
+              <p class="page-desc">Regional dispatch throughput, fulfillment speeds, and customer satisfaction metrics</p>
+            </div>
+          </div>
+          <div class="region-cards-grid" id="regionCards"></div>
+          <div class="grid-2">
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-bar-chart-horizontal-line"></i> Revenue by Regional Distribution Hub</h3></div></div>
+              <div class="card-body chart-h350"><canvas id="regionBarChart"></canvas></div>
+            </div>
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-radar-line"></i> Regional Operations Efficiency Radar</h3></div></div>
+              <div class="card-body chart-h350"><canvas id="regionRadarChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 6. WAREHOUSE OPERATIONS ═══════ -->
+        <div class="sub-page" id="subpage-stores">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-truck-line"></i> Warehouse Operations & Delivery Performance</h1>
+              <p class="page-desc">Comparative fulfillment metrics, on-time delivery rates, and commercial accounts serviced</p>
+            </div>
+          </div>
+          <div class="store-cards-grid" id="storeCards"></div>
+          <div class="card card-chart">
+            <div class="card-header"><div class="card-title-group"><h3><i class="ri-bar-chart-grouped-line"></i> Warehouse Revenue vs. Commercial Footfall Dispatched</h3></div></div>
+            <div class="card-body chart-h400"><canvas id="storeDetailChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- ═══════ 7. INTAKE & VELOCITY TRENDS ═══════ -->
+        <div class="sub-page" id="subpage-trends">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-pulse-line"></i> Supply Chain Velocity & Intake Trends</h1>
+              <p class="page-desc">B2B commercial order intake curves, 30-day velocity, and category growth momentum</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-time-line"></i> 24-Hour B2B Order Intake Pattern</h3><p class="card-desc">Commercial garage ordering cycles</p></div></div>
+              <div class="card-body chart-h350"><canvas id="trafficDetailChart"></canvas></div>
+            </div>
+            <div class="card card-chart">
+              <div class="card-header"><div class="card-title-group"><h3><i class="ri-line-chart-line"></i> 30-Day Daily Order Volume</h3><p class="card-desc">Parts volume and invoice trends</p></div></div>
+              <div class="card-body chart-h350"><canvas id="trendDailyChart"></canvas></div>
+            </div>
+          </div>
+          <div class="card card-chart">
+            <div class="card-header"><div class="card-title-group"><h3><i class="ri-bar-chart-2-line"></i> Year-Over-Year Category Expansion Rate</h3><p class="card-desc">Annual percentage growth across all 8 automotive sectors</p></div></div>
+            <div class="card-body chart-h350"><canvas id="growthChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- ═══════ 8. APEXGEAR AI CHAT ═══════ -->
+        <div class="sub-page" id="subpage-ai-chat">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-robot-2-line"></i> ApexGear AI — Automotive Operations Advisor</h1>
+              <p class="page-desc">Ask real-time questions regarding aftermarket parts velocity, fleet contracts, hub shipping speeds, and inventory allocation — powered by Groq LLaMA 3.3 70B</p>
+            </div>
+            <span class="groq-badge"><i class="ri-cpu-line"></i> Groq LLaMA 3.3 70B Active</span>
+          </div>
+          <div class="chat-wrapper">
+            <div class="chat-container">
+              <div class="chat-messages" id="chatMessages">
+                <div class="chat-message bot">
+                  <div class="chat-avatar bot-av"><i class="ri-robot-2-fill"></i></div>
+                  <div class="chat-bubble">
+                    <p>Welcome to <strong>ApexGear AI</strong>! 🏎️ I'm your Senior Automotive Operations & Inventory Analyst.</p>
+                    <p style="margin-top:8px;font-size:0.86rem;color:var(--text-2)">I have direct access to your 8 parts categories, 5 regional fulfillment hubs, and B2B fleet telemetry. How can I assist your operations today?</p>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-area">
+                <div class="chat-suggestions">
+                  <button class="suggestion-chip" onclick="askSuggestion('Which category has the highest profit margin and fastest growth?')"><i class="ri-fire-line"></i> High-Margin Categories</button>
+                  <button class="suggestion-chip" onclick="askSuggestion('Forecast Q1 fleet brake and turbo demand')"><i class="ri-funds-line"></i> Q1 Demand Projection</button>
+                  <button class="suggestion-chip" onclick="askSuggestion('Compare our 5 warehouse fulfillment speeds')"><i class="ri-truck-line"></i> Hub Fulfillment</button>
+                  <button class="suggestion-chip" onclick="askSuggestion('Which SKUs have low stock but high re-order velocity?')"><i class="ri-alert-line"></i> Low Stock Alerts</button>
+                  <button class="suggestion-chip" onclick="askSuggestion('Give me 3 strategic recommendations for commercial fleet expansion')"><i class="ri-lightbulb-line"></i> Fleet Recommendations</button>
+                </div>
+                <div class="chat-input-row">
+                  <input type="text" id="chatInput" placeholder="Ask ApexGear AI about parts, hubs, margins, or inventory..." onkeydown="if(event.key==='Enter')sendChat()" />
+                  <button class="chat-send-btn" onclick="sendChat()"><i class="ri-send-plane-fill"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 9. AI REVENUE & DEMAND FORECAST ═══════ -->
+        <div class="sub-page" id="subpage-forecast">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-flashlight-line"></i> AI Automotive Demand Forecast</h1>
+              <p class="page-desc">Predictive 3-month seasonal parts demand and restocking recommendations powered by Groq LLaMA 3.3 70B</p>
+            </div>
+            <button class="btn-primary" onclick="getForecast()"><i class="ri-sparkling-2-fill"></i> Generate Operations Forecast</button>
+          </div>
+          <div class="card card-chart">
+            <div class="card-header"><div class="card-title-group"><h3><i class="ri-funds-line"></i> Baseline Historical Sales Run Rate</h3><p class="card-desc">12-month automotive gross volume used for predictive inference</p></div></div>
+            <div class="card-body chart-h300"><canvas id="forecastBaseChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title-group"><h3><i class="ri-magic-line"></i> Predictive Demand Projections</h3><p class="card-desc">Next 3-month forecast with confidence intervals and supply chain reasoning</p></div></div>
+            <div class="card-body" id="forecastContainer">
+              <div class="forecast-empty">
+                <i class="ri-roadster-line"></i>
+                <p>Click <strong>Generate Operations Forecast</strong> to run real-time predictive analytics on your auto parts catalog</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 10. WHO WE ARE & WHAT WE DO (ABOUT US) ═══════ -->
+        <div class="sub-page" id="subpage-about">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-information-line"></i> Corporate Profile — Who We Are & What We Do</h1>
+              <p class="page-desc">ApexDrive Engineering & Global Aftermarket Telemetry Operations</p>
+            </div>
+          </div>
+
+          <div class="corporate-hero">
+            <span class="corp-badge"><i class="ri-medal-fill"></i> OEM & Motorsport Heritage</span>
+            <h2 class="corp-title">Engineering Beyond Limits. Powering Global High-Performance Fleet Operations.</h2>
+            <p class="corp-lead">
+              ApexDrive is a global Tier-1 commercial distributor and precision engineering partner specializing in race-grade braking systems, forced induction turbochargers, adaptive coilovers, and high-velocity fleet logistics. Partnered with official teams across the Porsche Carrera Cup, IMSA WeatherTech Championship, and BMW M-Performance customer racing programs.
+            </p>
+            <div class="header-actions">
+              <button class="btn-primary" onclick="navigateTo('products')"><i class="ri-tools-line"></i> Explore 18 Premium SKUs</button>
+              <button class="btn-ghost" onclick="navigateTo('admin')"><i class="ri-shield-user-line"></i> Executive Leadership</button>
+              <button class="btn-ghost" onclick="navigateTo('regions')"><i class="ri-map-pin-2-line"></i> 5 Global Hubs</button>
+            </div>
+            <div class="corp-stats-row">
+              <div class="corp-stat-item">
+                <span class="corp-stat-val">$2.84M+</span>
+                <span class="corp-stat-lbl">Annual Parts Gross</span>
+              </div>
+              <div class="corp-stat-item">
+                <span class="corp-stat-val">3,840+</span>
+                <span class="corp-stat-lbl">Garages & Speedshops</span>
+              </div>
+              <div class="corp-stat-item">
+                <span class="corp-stat-val">98.4%</span>
+                <span class="corp-stat-lbl">On-Time Dispatch Rate</span>
+              </div>
+              <div class="corp-stat-item">
+                <span class="corp-stat-val">&lt;48 hrs</span>
+                <span class="corp-stat-lbl">Average Hub Fulfillment</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3><i class="ri-shield-check-line"></i> Our Mission & Standards</h3>
+                  <p class="card-desc">Motorsport tolerances adapted for commercial reliability</p>
+                </div>
+              </div>
+              <div class="card-body">
+                <p style="color:var(--text-2);line-height:1.65;margin-bottom:16px;">
+                  We eliminate vehicle downtime for specialized tuning shops, performance automotive dealerships, and municipal emergency fleets through real-time predictive inventory distribution powered by Groq LLaMA 3.3 70B AI.
+                </p>
+                <div class="spec-grid" style="grid-template-columns:1fr 1fr;gap:12px;">
+                  <div class="spec-box">
+                    <div class="spec-box-label">ISO-9001:2020</div>
+                    <div style="font-size:0.85rem;color:var(--text-1);font-weight:700;">Certified Motorsport QA</div>
+                  </div>
+                  <div class="spec-box">
+                    <div class="spec-box-label">TÜV SÜD Tested</div>
+                    <div style="font-size:0.85rem;color:var(--text-1);font-weight:700;">Rotors, Pads & Coilovers</div>
+                  </div>
+                  <div class="spec-box">
+                    <div class="spec-box-label">Zero-Defect Goal</div>
+                    <div style="font-size:0.85rem;color:var(--text-1);font-weight:700;">1.2% Low Warranty RMA</div>
+                  </div>
+                  <div class="spec-box">
+                    <div class="spec-box-label">EcoPackaging</div>
+                    <div style="font-size:0.85rem;color:var(--text-1);font-weight:700;">100% Recyclable Foam</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3><i class="ri-global-line"></i> Global Strategic Footprint</h3>
+                  <p class="card-desc">Cross-docking operations in North America & Europe</p>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="intel-bullets">
+                  <li><i class="ri-checkbox-circle-fill"></i> <div><strong>Detroit Mega-Hub (DTW):</strong> 220,000 sq ft central automation hub serving Midwest OEM supply lines and American V8 powertrain rebuilds.</div></li>
+                  <li><i class="ri-checkbox-circle-fill"></i> <div><strong>Dallas Logistics Depot (DFW):</strong> Heavy-duty diesel upgrades, fleet suspension systems, and offroad commercial accounts.</div></li>
+                  <li><i class="ri-checkbox-circle-fill"></i> <div><strong>Los Angeles Port Hub (LAX):</strong> Japanese domestic market (JDM) imports, titanium exhausts, and track-day tire inventory.</div></li>
+                  <li><i class="ri-checkbox-circle-fill"></i> <div><strong>Frankfurt Euro Depot (FRA):</strong> Direct pipeline from German Tier-1 manufacturers (Bilstein, BBS, Motul, Bosch).</div></li>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 11. EXECUTIVE ADMINISTRATION & LEADERSHIP ═══════ -->
+        <div class="sub-page" id="subpage-admin">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-shield-user-line"></i> Executive Administration & Governance</h1>
+              <p class="page-desc">The engineering and operations leadership governing ApexDrive global distribution</p>
+            </div>
+          </div>
+
+          <div class="leadership-grid">
+            <div class="leader-card">
+              <div class="leader-avatar-wrap"><i class="ri-user-star-fill"></i></div>
+              <div class="leader-name">Marcus Vance</div>
+              <div class="leader-role">Chief Executive Officer</div>
+              <p class="leader-bio">
+                Former Director of Customer Racing Operations at Porsche Motorsport North America. Over 22 years spearheading global supply chains, racing team partnerships, and high-performance aftermarket manufacturing.
+              </p>
+              <div class="leader-meta">
+                <span>Executive Office</span>
+                <span style="color:var(--cyan)">Detroit DTW</span>
+              </div>
+            </div>
+
+            <div class="leader-card">
+              <div class="leader-avatar-wrap" style="color:var(--orange)"><i class="ri-user-settings-fill"></i></div>
+              <div class="leader-name">Elena Rodriguez</div>
+              <div class="leader-role">VP Global Supply Chain</div>
+              <p class="leader-bio">
+                Ex-Senior Director of Supply Chain Logistics at DHL Freight & Brembo S.p.A. Architect of ApexDrive's predictive inventory buffer and automated cross-docking network across 5 global hubs.
+              </p>
+              <div class="leader-meta">
+                <span>Operations</span>
+                <span style="color:var(--orange)">Dallas DFW</span>
+              </div>
+            </div>
+
+            <div class="leader-card">
+              <div class="leader-avatar-wrap" style="color:var(--green)"><i class="ri-tools-fill"></i></div>
+              <div class="leader-name">Dr. Hans Mueller</div>
+              <div class="leader-role">Head of Powertrain R&D</div>
+              <p class="leader-bio">
+                Former Lead Thermal Engineer at BMW M Division and Garrett Motion. Holds a Ph.D. in Mechanical Engineering from TUM Munich; directs product validation for turbos, forged internals, and thermal ceramics.
+              </p>
+              <div class="leader-meta">
+                <span>Engineering & TÜV</span>
+                <span style="color:var(--green)">Frankfurt FRA</span>
+              </div>
+            </div>
+
+            <div class="leader-card">
+              <div class="leader-avatar-wrap" style="color:var(--purple)"><i class="ri-cpu-fill"></i></div>
+              <div class="leader-name">Kenji Sato</div>
+              <div class="leader-role">Director of Cloud Telemetry</div>
+              <p class="leader-bio">
+                Former Lead Telemetry Architect for Super GT and NISMO Racing. Pioneer of edge AI diagnostics, CAN-bus cloud synchronization, and real-time Groq LLaMA integration for inventory optimization.
+              </p>
+              <div class="leader-meta">
+                <span>AI & Infrastructure</span>
+                <span style="color:var(--purple)">Los Angeles LAX</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3><i class="ri-bank-line"></i> Corporate Governance & Board Compliance</h3>
+                <p class="card-desc">Safety, supply chain transparency, and carbon offset initiatives</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="spec-grid">
+                <div class="spec-box">
+                  <div class="spec-box-label">Supply Chain Transparency</div>
+                  <div style="font-size:0.95rem;color:#fff;font-weight:700;">100% Conflict-Free Titanium & Carbon Fiber</div>
+                </div>
+                <div class="spec-box">
+                  <div class="spec-box-label">Warranty Assurance</div>
+                  <div style="font-size:0.95rem;color:#fff;font-weight:700;">3-Year Track & Street Commercial Guarantee</div>
+                </div>
+                <div class="spec-box">
+                  <div class="spec-box-label">Freight Decarbonization</div>
+                  <div style="font-size:0.95rem;color:#fff;font-weight:700;">34% Hybrid & Electric Hauler Fleet by 2027</div>
+                </div>
+                <div class="spec-box">
+                  <div class="spec-box-label">Financial Audit</div>
+                  <div style="font-size:0.95rem;color:#fff;font-weight:700;">Big-4 Audited FY2026 Financial Reports</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 12. BUSINESS TRENDS & MARKET INTELLIGENCE ═══════ -->
+        <div class="sub-page" id="subpage-trends-intel">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-radar-line"></i> Automotive Business Trends & Market Shifts</h1>
+              <p class="page-desc">Macroeconomic aftermarket shifts, hybrid electrification, and demand trends</p>
+            </div>
+            <button class="btn-primary" onclick="navigateTo('ai-chat')"><i class="ri-robot-2-line"></i> Ask Groq AI for Strategic Briefing</button>
+          </div>
+
+          <div class="intel-grid">
+            <div class="intel-card">
+              <span class="intel-badge">High Growth • +28.4% YoY</span>
+              <h3 class="intel-title">Electrification & 48V Performance Hybrids</h3>
+              <p class="intel-text">
+                The shift toward performance plug-in hybrids (e.g. Porsche 911 T-Hybrid, Corvette E-Ray, BMW M5 Hybrid) is creating unprecedented demand for high-voltage thermal cooling, 48V electric e-turbos, and regenerative braking pad friction materials.
+              </p>
+              <ul class="intel-bullets">
+                <li><i class="ri-arrow-right-circle-fill"></i> +41% surge in ceramic composite brake kits with high initial bite at low thermal ranges.</li>
+                <li><i class="ri-arrow-right-circle-fill"></i> Dual-core aluminum intercooler adoption growing at +32% across turbocharged hybrids.</li>
+              </ul>
+            </div>
+
+            <div class="intel-card">
+              <span class="intel-badge" style="background:rgba(0,242,254,0.12);color:var(--cyan);border-color:rgba(0,242,254,0.3);">Supply Chain Evolution</span>
+              <h3 class="intel-title">Nearshoring & Regional Automated Micro-Hubs</h3>
+              <p class="intel-text">
+                Traditional 14-day global container transit has been supplanted by our 5 strategically pre-positioned distribution hubs. Garages no longer carry dead stock, ordering on-demand with same-day dispatch.
+              </p>
+              <ul class="intel-bullets">
+                <li><i class="ri-arrow-right-circle-fill"></i> Commercial downtime slashed from 4.2 days to under 28 hours per vehicle repair.</li>
+                <li><i class="ri-arrow-right-circle-fill"></i> Detroit & Frankfurt hubs achieve 98.4% on-time logistics fulfillment rates.</li>
+              </ul>
+            </div>
+
+            <div class="intel-card">
+              <span class="intel-badge" style="background:rgba(0,230,118,0.12);color:var(--green);border-color:rgba(0,230,118,0.3);">Commercial Fleet Tuning</span>
+              <h3 class="intel-title">Fleet Upgrades for Extreme Duty Durability</h3>
+              <p class="intel-text">
+                Commercial transport companies are retrofitting fleets with motorsport-grade brakes and HD coilovers to extend replacement cycles from 18,000 miles to 50,000+ miles under extreme hauling stress.
+              </p>
+              <ul class="intel-bullets">
+                <li><i class="ri-arrow-right-circle-fill"></i> StopTech braided stainless brake line orders surged +46% across van fleets.</li>
+                <li><i class="ri-arrow-right-circle-fill"></i> Commercial fleet accounts generate $1,050 average purchase order ticket.</li>
+              </ul>
+            </div>
+
+            <div class="intel-card">
+              <span class="intel-badge" style="background:rgba(139,92,246,0.12);color:var(--purple);border-color:rgba(139,92,246,0.3);">Track-Day Culture</span>
+              <h3 class="intel-title">Amateur Motorsport & Club Racing Boom</h3>
+              <p class="intel-text">
+                Private track-day participants and club racing leagues are driving huge recurring volume in semi-slick track tires (Michelin Cup 2), Motul 300V Ester lubricants, and quick-change brake pads.
+              </p>
+              <ul class="intel-bullets">
+                <li><i class="ri-arrow-right-circle-fill"></i> Racing fluids experience 8.4x annualized inventory turnover in peak spring season.</li>
+                <li><i class="ri-arrow-right-circle-fill"></i> Lightweight forged monoblock BBS wheelsets show 0% RMA returns.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 13. CUSTOMER BEHAVIOUR & FLEET DYNAMICS ═══════ -->
+        <div class="sub-page" id="subpage-customer-behavior">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('dashboard')"><i class="ri-arrow-left-line"></i> Back to Overview</button>
+              <h1 class="page-title"><i class="ri-user-star-line"></i> Customer Behaviour & Commercial Cohort Analytics</h1>
+              <p class="page-desc">Ordering habits, retention curves, ticket values, and purchasing triggers across 3,840 garage accounts</p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="cohort-card">
+              <div class="cohort-header">
+                <div class="cohort-icon" style="background:var(--grad-cyan)"><i class="ri-building-line"></i></div>
+                <span class="cohort-retention" style="background:rgba(0,242,254,0.14);color:var(--cyan);border:1px solid rgba(0,242,254,0.3);">94.2% Retention</span>
+              </div>
+              <h3 style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:6px;">Tier-1 OEM Dealerships</h3>
+              <p style="font-size:0.84rem;color:var(--text-2);line-height:1.55;margin-bottom:16px;">
+                Franchised Porsche, BMW, and Audi service departments requiring certified direct fitments with 100% warranty validation.
+              </p>
+              <div class="spec-grid" style="grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="spec-box">
+                  <div class="spec-box-label">Avg PO Ticket</div>
+                  <div class="spec-box-val" style="color:var(--cyan);">$1,420</div>
+                </div>
+                <div class="spec-box">
+                  <div class="spec-box-label">Order Cadence</div>
+                  <div class="spec-box-val" style="font-size:1.05rem;">Bi-Weekly</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cohort-card">
+              <div class="cohort-header">
+                <div class="cohort-icon" style="background:var(--grad-orange)"><i class="ri-fire-line"></i></div>
+                <span class="cohort-retention" style="background:rgba(255,107,0,0.14);color:var(--orange);border:1px solid rgba(255,107,0,0.3);">91.5% Retention</span>
+              </div>
+              <h3 style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:6px;">Pro-Tuner Speedshops</h3>
+              <p style="font-size:0.84rem;color:var(--text-2);line-height:1.55;margin-bottom:16px;">
+                Independent high-horsepower dyno tuning shops installing Garrett turbos, Akrapovic titanium exhausts, and Bilstein coilovers.
+              </p>
+              <div class="spec-grid" style="grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="spec-box">
+                  <div class="spec-box-label">Avg PO Ticket</div>
+                  <div class="spec-box-val" style="color:var(--orange);">$2,680</div>
+                </div>
+                <div class="spec-box">
+                  <div class="spec-box-label">Order Cadence</div>
+                  <div class="spec-box-val" style="font-size:1.05rem;">Weekly (Spike Thu/Fri)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cohort-card">
+              <div class="cohort-header">
+                <div class="cohort-icon" style="background:var(--grad-green)"><i class="ri-truck-line"></i></div>
+                <span class="cohort-retention" style="background:rgba(0,230,118,0.14);color:var(--green);border:1px solid rgba(0,230,118,0.3);">96.0% Retention</span>
+              </div>
+              <h3 style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:6px;">Commercial Fleet Operators</h3>
+              <p style="font-size:0.84rem;color:var(--text-2);line-height:1.55;margin-bottom:16px;">
+                Municipal service vans, emergency response vehicles, and transport haulers buying bulk brakes, alternators, and fluids.
+              </p>
+              <div class="spec-grid" style="grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="spec-box">
+                  <div class="spec-box-label">Avg PO Ticket</div>
+                  <div class="spec-box-val" style="color:var(--green);">$890</div>
+                </div>
+                <div class="spec-box">
+                  <div class="spec-box-label">Order Cadence</div>
+                  <div class="spec-box-val" style="font-size:1.05rem;">Monthly Scheduled</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cohort-card">
+              <div class="cohort-header">
+                <div class="cohort-icon" style="background:var(--grad-4)"><i class="ri-speed-up-line"></i></div>
+                <span class="cohort-retention" style="background:rgba(139,92,246,0.14);color:var(--purple);border:1px solid rgba(139,92,246,0.3);">82.4% Retention</span>
+              </div>
+              <h3 style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:6px;">Track Enthusiasts & Privateers</h3>
+              <p style="font-size:0.84rem;color:var(--text-2);line-height:1.55;margin-bottom:16px;">
+                Individual amateur racers and track club members buying Michelin semi-slicks, Motul 300V fluids, and EBC slotted rotors.
+              </p>
+              <div class="spec-grid" style="grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="spec-box">
+                  <div class="spec-box-label">Avg PO Ticket</div>
+                  <div class="spec-box-val" style="color:var(--purple);">$520</div>
+                </div>
+                <div class="spec-box">
+                  <div class="spec-box-label">Order Cadence</div>
+                  <div class="spec-box-val" style="font-size:1.05rem;">Seasonal Track Spikes</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 14. MULTI-SESSION DRILLDOWN: HUB DETAIL ═══════ -->
+        <div class="sub-page" id="subpage-hub-detail">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('regions')"><i class="ri-arrow-left-line"></i> Back to Hub Telemetry</button>
+              <h1 class="page-title" id="hubDetailTitle"><i class="ri-building-line"></i> Regional Distribution Hub</h1>
+              <p class="page-desc" id="hubDetailSubtitle">Live bay telemetry, inventory volume, and dispatch fleet</p>
+            </div>
+            <div class="drilldown-actions">
+              <button class="btn-primary" onclick="queryAiAboutHub()"><i class="ri-robot-2-line"></i> Ask AI About This Hub</button>
+            </div>
+          </div>
+
+          <div class="drilldown-hero" id="hubHeroBanner">
+            <div>
+              <span class="drilldown-tag" id="hubHeroCode">HUB-DTW</span>
+              <h2 class="drilldown-title" id="hubHeroName">Detroit Central Mega-Hub</h2>
+              <p style="color:var(--text-2);margin-top:6px;" id="hubHeroRegion">Midwest Fleet & OEM Rebuild Supply Line</p>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.8rem;color:var(--text-3);text-transform:uppercase;font-weight:800;">Throughput Revenue</div>
+              <div style="font-size:2.4rem;font-weight:900;font-family:'JetBrains Mono';color:var(--cyan);" id="hubHeroRevenue">$840.5K</div>
+            </div>
+          </div>
+
+          <div class="spec-grid" id="hubSpecsGrid">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3><i class="ri-truck-line"></i> Live Dispatch & Automated Bay Telemetry</h3>
+                <p class="card-desc">Active haulers, cross-dock loading status, and local delivery SLA</p>
+              </div>
+            </div>
+            <div class="card-body" id="hubTelemetryBody">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ 15. MULTI-SESSION DRILLDOWN: SKU DETAIL ═══════ -->
+        <div class="sub-page" id="subpage-sku-detail">
+          <div class="page-header">
+            <div>
+              <button class="back-btn" onclick="navigateTo('products')"><i class="ri-arrow-left-line"></i> Back to Parts Catalog</button>
+              <h1 class="page-title" id="skuDetailTitle"><i class="ri-tools-fill"></i> SKU Engineering Telemetry</h1>
+              <p class="page-desc" id="skuDetailSubtitle">Fitment data, stock across 5 hubs, warranty RMA, and sales run rate</p>
+            </div>
+            <div class="drilldown-actions">
+              <button class="btn-primary" onclick="queryAiAboutSku()"><i class="ri-robot-2-line"></i> Ask AI About Fitment</button>
+            </div>
+          </div>
+
+          <div class="drilldown-hero" id="skuHeroBanner">
+            <div>
+              <span class="drilldown-tag" id="skuHeroTag">APX-BRM-940</span>
+              <h2 class="drilldown-title" id="skuHeroName">Brembo GT-R 6-Piston Carbon-Ceramic Brake Kit</h2>
+              <p style="color:var(--text-2);margin-top:6px;" id="skuHeroFitment">Porsche 911 / BMW M3 / C8 Corvette</p>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.8rem;color:var(--text-3);text-transform:uppercase;font-weight:800;">Unit Commercial Price</div>
+              <div style="font-size:2.4rem;font-weight:900;font-family:'JetBrains Mono';color:var(--orange);" id="skuHeroPrice">$4,250</div>
+            </div>
+          </div>
+
+          <div class="spec-grid" id="skuSpecsGrid">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3><i class="ri-archive-line"></i> Stock Distribution Across 5 Regional Hubs</h3>
+                <p class="card-desc">Current inventory counts, reserved fleet orders, and 30-day fulfillment velocity</p>
+              </div>
+            </div>
+            <div class="card-body" id="skuHubStockBody">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Floating AI FAB -->
+  <button class="fab-ai" id="fabAi" onclick="navigateTo('ai-chat')" title="Open ApexGear AI Assistant">
+    <i class="ri-robot-2-fill"></i>
+    <div class="fab-pulse"></div>
+  </button>
+
+  <!-- API Key Modal -->
+  <div class="modal-overlay" id="keyModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ri-key-2-fill text-apex-orange"></i> Groq LPU API Configuration</div>
+        <button class="modal-close" onclick="closeKeyModal()"><i class="ri-close-line"></i></button>
+      </div>
+      
+      <!-- Current Status Banner -->
+      <div id="modalStatusBanner" class="p-3 mb-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <span id="modalStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_#00e676]"></span>
+          <span id="modalStatusText" class="font-bold text-slate-200">Checking Groq status...</span>
+        </div>
+        <span id="modalModelBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white/10 text-cyan-300">LLaMA 3.3 70B</span>
+      </div>
+
+      <p class="modal-desc">Connect your <strong>Groq API Key</strong> to activate ultra-fast LPU inference (LLaMA 3.3 70B Versatile) for live aftermarket inventory insights, demand forecasting, and fleet telemetry conversational intelligence.</p>
+      
+      <div class="modal-input-group">
+        <label class="modal-label" for="apiKeyInput">Groq API Key (from console.groq.com)</label>
+        <div class="relative flex items-center">
+          <input type="password" id="apiKeyInput" class="modal-input pr-10 font-mono text-xs" placeholder="gsk_..." />
+          <button type="button" class="absolute right-3 text-slate-400 hover:text-cyan-400 transition" onclick="toggleKeyVisibility()" title="Toggle Visibility">
+            <i id="keyEyeIcon" class="ri-eye-line"></i>
+          </button>
+        </div>
+        <div id="keyFeedback" class="text-xs mt-2 font-medium hidden"></div>
+      </div>
+      
+      <div class="modal-actions flex items-center justify-between pt-2">
+        <div>
+          <button id="btnDisconnectKey" class="text-xs text-rose-400 hover:text-rose-300 font-semibold px-2 py-1 rounded transition hover:bg-rose-500/10 hidden" onclick="disconnectApiKey()">Disconnect Key</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn-ghost" onclick="closeKeyModal()">Cancel</button>
+          <button class="btn-primary" id="btnSaveKey" onclick="saveApiKey()">
+            <i class="ri-flashlight-line"></i> <span id="btnSaveKeyText">Test & Save</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"><i class="ri-checkbox-circle-fill"></i> <span id="toastMsg">Saved!</span></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
