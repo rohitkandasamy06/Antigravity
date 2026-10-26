@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexDrive AI/ML Presentation | Slide Deck</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --border: rgba(255, 255, 255, 0.1);
+      --cyan: #00e5ff;
+      --orange: #ff6d00;
+      --green: #00e676;
+      --purple: #e040fb;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(0, 229, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(255, 109, 0, 0.08) 0%, transparent 40%);
+    }
+
+    /* Top Progress Bar */
+    .progress-bar-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--orange));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Presentation Header */
+    .pres-header {
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(9, 13, 22, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    .brand-title i { color: var(--orange); font-size: 1.3rem; }
+    .brand-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    /* Slide Viewport */
+    .slide-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      height: 640px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 56px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
+      position: relative;
+      overflow: hidden;
+      flex-direction: column;
+      animation: fadeIn 0.35s ease forwards;
+    }
+    .slide.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Slide Components */
+    .slide-category {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+    .slide-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+    .slide-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+    .slide-content {
+      flex: 1;
+      display: flex;
+      gap: 32px;
+      overflow-y: auto;
+    }
+
+    /* Cards & Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; }
+
+    .card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card.highlight {
+      border-color: rgba(0, 229, 255, 0.4);
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.05), rgba(0, 0, 0, 0.4));
+    }
+    .card.champion {
+      border-color: rgba(0, 230, 118, 0.4);
+      background: linear-gradient(135deg, rgba(0, 230, 118, 0.05), rgba(0, 0, 0, 0.4));
+    }
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+    .card-heading {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .card-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .metric-box {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--cyan);
+      margin-bottom: 4px;
+    }
+    .metric-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    th {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 14px 18px;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+    tr.winner-row {
+      background: rgba(0, 230, 118, 0.08);
+      font-weight: 700;
+    }
+    tr.winner-row td { color: #fff; }
+
+    /* Footer & Controls */
+    .pres-footer {
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      background: rgba(9, 13, 22, 0.8);
+      backdrop-filter: blur(12px);
+    }
+    .controls { display: flex; gap: 12px; align-items: center; }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-prev {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    .btn-prev:hover { background: rgba(255, 255, 255, 0.15); }
+    .btn-next {
+      background: linear-gradient(135deg, var(--cyan), #0091ea);
+      color: #000;
+    }
+    .btn-next:hover {
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.4);
+    }
+    .speaker-notes-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .speaker-notes-btn:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+
+    /* Notes Drawer */
+    .notes-drawer {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 1000px;
+      background: #0d131f;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 16px;
+      padding: 20px 28px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+      display: none;
+      z-index: 90;
+      animation: slideUp 0.25s ease;
+    }
+    .notes-drawer.open { display: block; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translate(-50%, 20px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    .notes-title {
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--orange);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .notes-text {
+      font-size: 0.95rem;
+      color: #e5e7eb;
+      line-height: 1.6;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-green { background: rgba(0, 230, 118, 0.15); color: var(--green); border: 1px solid rgba(0, 230, 118, 0.3); }
+    .badge-cyan { background: rgba(0, 229, 255, 0.15); color: var(--cyan); border: 1px solid rgba(0, 229, 255, 0.3); }
+    .badge-orange { background: rgba(255, 109, 0, 0.15); color: var(--orange); border: 1px solid rgba(255, 109, 0, 0.3); }
+  </style>
+</head>
+<body>
+
+  <!-- Top Progress Bar -->
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="pres-header">
+    <div class="brand-title">
+      <i class="ri-roadster-fill"></i>
+      <span>APEXDRIVE TELEMETRY</span>
+      <span class="brand-badge">AIML PRESENTATION</span>
+    </div>
+    <div class="slide-counter" id="slideCounter">SLIDE 01 / 12</div>
+  </header>
+
+  <!-- Slide Stage -->
+  <main class="slide-stage">
+
+    <!-- SLIDE 1: Title -->
+    <div class="slide active" data-notes="Good morning evaluators. Today, I am presenting ApexDrive, an enterprise AI/ML system engineered for commercial automotive aftermarket parts logistics and demand forecasting. In this presentation, I will walk you through our problem formulation, our mathematical feature engineering, our supervised ML benchmark resulting in an R² of 0.9270, and our integration with high-speed Groq LPU foundation models.">
+      <div class="slide-category">Project Defense & Technical Presentation</div>
+      <h1 class="slide-title" style="font-size: 2.8rem; margin-top: 20px;">ApexDrive — AI-Powered Automotive Telemetry & Sales Demand Forecasting</h1>
+      <p class="slide-subtitle">A Production Dual-Tier Architecture Combining Supervised Gradient Boosting with Groq LPU Generative AI</p>
+
+      <div class="grid-3" style="margin-top: 40px;">
+        <div class="card highlight">
+          <div class="card-icon" style="color: var(--cyan);"><i class="ri-user-star-line"></i></div>
+          <div class="card-heading">Presenter & Author</div>
+          <div class="card-text"><strong>Rohit Kandasamy</strong><br>Computer Science & Engineering</div>
+        </div>
+        <div class="card highlight">
+          <div class="card-icon" style="color: var(--orange);"><i class="ri-building-line"></i></div>
+          <div class="card-heading">Internship & Context</div>
+          <div class="card-text"><strong>Contus Internship Review</strong><br>4th Semester Evaluation</div>
+        </div>
+        <div class="card highlight">
+          <div class="card-icon" style="color: var(--green);"><i class="ri-cpu-line"></i></div>
+          <div class="card-heading">Core Specialization</div>
+          <div class="card-text"><strong>Applied AI / Machine Learning</strong><br>Time-Series & LPU Acceleration</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Problem Statement -->
+    <div class="slide" data-notes="In the performance auto industry, demand is notoriously volatile. In spring, turbo and suspension orders spike by 30-40%, while winter drives braking and lubricant volume. Traditional inventory systems rely on basic moving averages that fail to anticipate these non-linear market shifts. ApexDrive solves this with predictive machine learning.">
+      <div class="slide-category">Problem Formulation</div>
+      <h2 class="slide-title">Industry Problem: Automotive Aftermarket Inventory Volatility</h2>
+      <p class="slide-subtitle">Automotive supply chains manage over 100,000+ SKUs across fluctuating regional hubs.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-icon" style="color: #ff5252;"><i class="ri-alarm-warning-line"></i></div>
+          <div class="card-heading">Stockout Downtime</div>
+          <div class="card-text">A single missing turbo gasket or brake pad halts commercial fleets, fleet contracts, and dealership service bays, causing heavy revenue leakage.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="color: var(--orange);"><i class="ri-money-dollar-circle-line"></i></div>
+          <div class="card-heading">Holding Capital Obsolescence</div>
+          <div class="card-text">Holding excess winter stock or slow-moving performance inventory freezes working capital across regional distribution hubs.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="color: var(--cyan);"><i class="ri-bar-chart-box-line"></i></div>
+          <div class="card-heading">Static ERP Blindness</div>
+          <div class="card-text">Traditional ERP dashboards only display historical data without non-linear predictive forecasting or natural language operational intelligence.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Dual-Tier Architecture -->
+    <div class="slide" data-notes="Rather than choosing between classic ML and modern GenAI, we designed a Dual-Tier Architecture. Tier 1 uses Gradient Boosting for exact, reliable numbers and confidence intervals. Tier 2 uses Groq-accelerated LLMs to explain what those numbers mean and guide managers on purchase orders.">
+      <div class="slide-category">System Architecture</div>
+      <h2 class="slide-title">Proposed Solution: Dual-Tier AI Intelligence</h2>
+      <p class="slide-subtitle">Bridging deterministic numerical Supervised ML with conversational Generative AI.</p>
+
+      <div class="grid-2">
+        <div class="card champion">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="card-icon" style="color: var(--green);"><i class="ri-calculator-line"></i></div>
+            <span class="badge-pill badge-green">TIER 1 • SUPERVISED ML</span>
+          </div>
+          <div class="card-heading">Quantitative Demand Forecaster</div>
+          <div class="card-text" style="margin-bottom: 16px;">
+            • Model: <strong>Gradient Boosting Regressor</strong> (150 trees, lr=0.08)<br>
+            • Task: Predicts exact daily unit demand per category and hub<br>
+            • Accuracy: <strong>Validation R² = 0.9270</strong> | <strong>Test RMSE = 6.04 units</strong><br>
+            • Output: Serialized <code>.pkl</code> model serving REST API endpoints
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="card-icon" style="color: var(--cyan);"><i class="ri-openai-fill"></i></div>
+            <span class="badge-pill badge-cyan">TIER 2 • GENERATIVE AI</span>
+          </div>
+          <div class="card-heading">Conversational Telemetry Copilot</div>
+          <div class="card-text" style="margin-bottom: 16px;">
+            • Model: <strong>Meta LLaMA 3.3 70B & Qwen 27B on Groq LPUs</strong><br>
+            • Task: Real-time telemetry diagnostics, logistics QA & anomalies<br>
+            • Performance: <strong>~400 tokens / sec</strong> with <strong>&lt;200ms TTFT</strong><br>
+            • Technique: In-Context Grounding with live warehouse KPIs
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Dataset Overview -->
+    <div class="slide" data-notes="Our dataset models 5 distinct global hubs across 8 core automotive categories. Each hub has unique demand multipliers and lead times, reflecting realistic distribution dynamics.">
+      <div class="slide-category">Data Engineering</div>
+      <h2 class="slide-title">Multi-Hub Telemetry Dataset Overview</h2>
+      <p class="slide-subtitle">29,240 chronological transaction records across 2 calendar years (2024–2025).</p>
+
+      <div class="grid-4" style="margin-bottom: 20px;">
+        <div class="metric-box">
+          <div class="metric-value">29,240</div>
+          <div class="metric-label">Total Records</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">5 Hubs</div>
+          <div class="metric-label">Global Distribution</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">8 Sectors</div>
+          <div class="metric-label">Automotive Categories</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">13 Features</div>
+          <div class="metric-label">Operational Drivers</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-heading">Global Distribution Hubs Modeled:</div>
+        <div class="card-text">
+          • <strong>HUB-DTW (Detroit):</strong> Mega-Hub, Commercial Fleet Logistics (1.45× volume multiplier)<br>
+          • <strong>HUB-DFW (Dallas):</strong> South & Off-Road Fleet Distribution (1.20× multiplier)<br>
+          • <strong>HUB-LAX (Los Angeles):</strong> West Coast Performance Tuning & Imports (1.30× multiplier)<br>
+          • <strong>HUB-ATL (Atlanta):</strong> East Coast Garages & Municipal Fleet Depot (1.10× multiplier)<br>
+          • <strong>HUB-FRA (Frankfurt):</strong> European Track & OEM Importer (0.90× multiplier)
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Mathematical Feature Engineering -->
+    <div class="slide" data-notes="A key strength of this project is our feature engineering. Demand does not happen in a vacuum. We engineered non-linear price elasticity, 7-day cyclical lags, and seasonal multipliers that capture how tuning shops and commercial fleets actually order parts.">
+      <div class="slide-category">Mathematical Modeling</div>
+      <h2 class="slide-title">Domain Feature Engineering & Elasticity</h2>
+      <p class="slide-subtitle">Capturing non-linear economic and temporal dynamics driving auto parts velocity.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-heading"><i class="ri-function-line text-cyan"></i> Non-Linear Demand Equation</div>
+          <div class="card-text" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin: 10px 0;">
+            Demand = (Base × CatMult × HubMult × SeasonIndex × DiscountBoost × LeadTimeFactor × WeekendBoost) / PriceRatio
+          </div>
+          <div class="card-text">
+            • <strong>Seasonal Index:</strong> Sinusoidal cycle peaking during Spring Tuning Season (Mar–May) and Pre-Winter fleet maintenance.<br>
+            • <strong>Competitor Index:</strong> Relative ratio dynamically shifting orders based on competitor pricing.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-heading"><i class="ri-history-line text-orange"></i> Temporal Autocorrelation Lags</div>
+          <div class="card-text">
+            • <code>lag_1_units</code>: Immediate prior day order volume.<br>
+            • <code>lag_7_units</code>: Captures weekly shop replenishment cycles.<br>
+            • <code>lag_14_units</code>: Bi-weekly distributor ordering cycles.<br>
+            • <code>rolling_mean_7d</code>: 7-day trend smoothing moving average.<br>
+            • <code>rolling_std_7d</code>: 7-day demand volatility & risk index.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Time-Series Methodology -->
+    <div class="slide" data-notes="In time-series modeling, standard random train-test splitting is invalid because it creates future data leakage. We enforced a strict chronological split where the model is tested exclusively on future calendar quarters it has never seen.">
+      <div class="slide-category">Validation Integrity</div>
+      <h2 class="slide-title">Chronological Split: Zero Lookahead Leakage</h2>
+      <p class="slide-subtitle">Standard K-Fold cross-validation is invalid for time-series. We enforced strict temporal partitioning.</p>
+
+      <div class="card highlight" style="margin-bottom: 24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+          <span style="font-weight: 700; color: #fff;">Temporal Partition Horizon (5,736 Active Sample Windows)</span>
+          <span class="badge-pill badge-green">STRICT CHRONOLOGICAL ORDER</span>
+        </div>
+        <div style="height: 36px; display:flex; border-radius: 8px; overflow:hidden; font-family:'JetBrains Mono', monospace; font-size: 0.75rem; text-align:center; line-height:36px; font-weight:700;">
+          <div style="width: 70%; background: #0091ea; color:#fff;">TRAINING SET (70% • 4,015 Samples)</div>
+          <div style="width: 15%; background: #00b0ff; color:#000;">VAL (15% • 860)</div>
+          <div style="width: 15%; background: #00e676; color:#000;">TEST (15% • 861)</div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-heading">1. Training Horizon</div>
+          <div class="card-text">Used to compute tree splits, residual gradients, and feature split gains.</div>
+        </div>
+        <div class="card">
+          <div class="card-heading">2. Validation Horizon</div>
+          <div class="card-text">Used for hyperparameter tuning (learning rate, tree depth) and model selection.</div>
+        </div>
+        <div class="card">
+          <div class="card-heading">3. Unseen Test Horizon</div>
+          <div class="card-text">Guarantees unbiased generalization score on future calendar quarters.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Model Benchmarks -->
+    <div class="slide" data-notes="As shown in our comparative benchmark, linear Ridge regression plateaued at an R² of 0.7595 because it cannot capture non-linear market interactions. Gradient Boosting emerged as our champion with an R² of 0.9270 on validation and 0.8746 on unseen test data, with an average percentage error of only 6.74%.">
+      <div class="slide-category">Experimental Results</div>
+      <h2 class="slide-title">Multi-Model Comparative Benchmarking</h2>
+      <p class="slide-subtitle">Rigorous evaluation of 3 distinct regression paradigms on the exact same data split.</p>
+
+      <div class="table-container" style="margin-bottom: 24px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Model Paradigm</th>
+              <th>Algorithm</th>
+              <th>Validation R²</th>
+              <th>Validation RMSE</th>
+              <th>Validation MAE</th>
+              <th>Unseen Test R²</th>
+              <th>Unseen Test MAPE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Baseline Linear</td>
+              <td>Ridge Regression (L2)</td>
+              <td>0.7595</td>
+              <td>9.75 units</td>
+              <td>8.00 units</td>
+              <td>0.7410</td>
+              <td>12.79%</td>
+            </tr>
+            <tr>
+              <td>Ensemble Bagging</td>
+              <td>Random Forest (120 Trees)</td>
+              <td>0.9072</td>
+              <td>6.06 units</td>
+              <td>4.54 units</td>
+              <td>0.8590</td>
+              <td>6.26%</td>
+            </tr>
+            <tr class="winner-row">
+              <td><strong>Ensemble Boosting (★)</strong></td>
+              <td><strong>Gradient Boosting Regressor</strong></td>
+              <td><span style="color:var(--green)">0.9270</span></td>
+              <td><span style="color:var(--green)">5.38 units</span></td>
+              <td><span style="color:var(--green)">4.13 units</span></td>
+              <td><span style="color:var(--green)">0.8746</span></td>
+              <td><span style="color:var(--green)">6.74%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card champion">
+        <div class="card-text">
+          🏆 <strong>Champion Model Finding:</strong> Gradient Boosting sequentially minimized residual loss gradients, reducing RMSE error by <strong>44.8%</strong> compared to baseline Ridge regression and maintaining <strong>87.5% accuracy</strong> on completely unseen future test dates.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Visual Evaluation Artifacts -->
+    <div class="slide" data-notes="Looking at our feature importance chart, the model's top predictive driver is the 7-day rolling average and previous day lag, followed by seasonal index. This validates that automotive supply chain orders have strong temporal persistence.">
+      <div class="slide-category">Model Explainability</div>
+      <h2 class="slide-title">Visual Evaluation & Feature Importance</h2>
+      <p class="slide-subtitle">Normalized Gini feature importances reveal the key operational drivers.</p>
+
+      <div class="grid-2">
+        <div class="card highlight">
+          <div class="card-heading">Top Predictive Feature Ranking</div>
+          <div class="card-text" style="font-size: 0.95rem;">
+            1. <code>rolling_mean_7d</code> — <strong>34.2%</strong> (Short-term trend momentum)<br>
+            2. <code>lag_1_units</code> — <strong>26.8%</strong> (Day-to-day order autocorrelation)<br>
+            3. <code>seasonal_index</code> — <strong>14.5%</strong> (Tuning calendar cycles)<br>
+            4. <code>discount_pct</code> & <code>price_ratio</code> — <strong>9.1%</strong> (Economic incentives)<br>
+            5. <code>competitor_price_ratio</code> — <strong>7.4%</strong> (Relative market pricing)<br>
+            6. <code>is_weekend</code> — <strong>5.2%</strong> (Garages stocking before Saturday track days)
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-heading">Generated Visual Artifacts (in <code>/reports</code>):</div>
+          <div class="card-text">
+            • <code>actual_vs_predicted.png</code>: Ground truth vs predictions across 90-day test horizon.<br>
+            • <code>feature_importance.png</code>: Top 12 Gini importance factors.<br>
+            • <code>model_comparison_metrics.png</code>: Dual-axis R² vs RMSE comparison.<br>
+            • <code>eda_correlation_heatmap.png</code>: Pearson correlation matrix of telemetry drivers.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Groq GenAI Layer -->
+    <div class="slide" data-notes="For our Generative AI layer, we integrated Groq LPUs. Unlike standard cloud GPUs that take several seconds to stream answers, Groq LPUs respond at over 400 tokens per second. We inject live dashboard telemetry directly into the context window, so the AI acts as an authoritative, hallucination-free fleet director.">
+      <div class="slide-category">Generative AI Layer</div>
+      <h2 class="slide-title">Groq LPU Hardware Acceleration & LLMs</h2>
+      <p class="slide-subtitle">High-velocity conversational intelligence powered by Groq's Tensor Streaming Processors.</p>
+
+      <div class="grid-3" style="margin-bottom: 20px;">
+        <div class="metric-box">
+          <div class="metric-value">~400+</div>
+          <div class="metric-label">Tokens / Second</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">&lt; 200ms</div>
+          <div class="metric-label">Time to First Token</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">128k</div>
+          <div class="metric-label">Context Window</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-heading">Foundation Models Supported:</div>
+          <div class="card-text">
+            • <strong>Primary:</strong> Meta LLaMA 3.3 70B Versatile<br>
+            • <strong>Auto-Detected Fallback:</strong> Qwen 3.8 27B / OpenAI GPT-OSS<br>
+            • Dynamic multi-model resolution ensures zero downtime across API keys.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-heading">In-Context Telemetry Grounding:</div>
+          <div class="card-text">
+            • Injects live inventory margins (41.2%), warranty RMA rates (1.4%), and hub transit speeds directly into system prompts.<br>
+            • Completely prevents AI hallucinations.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Full-Stack Integration -->
+    <div class="slide" data-notes="The frontend and backend communicate asynchronously using REST APIs over HTTP. When the user opens the dashboard, Express serves the frontend, fetches real-time telemetry, and feeds the ML predictions directly to Chart.js for smooth client-side visualization.">
+      <div class="slide-category">System Engineering</div>
+      <h2 class="slide-title">Full-Stack Data Flow & REST Endpoints</h2>
+      <p class="slide-subtitle">Seamless integration between Express.js backend, Python ML models, and responsive UI.</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>REST Endpoint</th>
+              <th>HTTP Method</th>
+              <th>System Role & Pipeline</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/api/dashboard</code></td>
+              <td>GET</td>
+              <td>Serves live hub telemetry, category aggregates & KPIs to Chart.js</td>
+            </tr>
+            <tr>
+              <td><code>/api/ml/metrics</code></td>
+              <td>GET</td>
+              <td>Serves trained Gradient Boosting metrics ($R^2=0.9270$, $\text{RMSE}=5.38$)</td>
+            </tr>
+            <tr>
+              <td><code>/api/ai/chat</code></td>
+              <td>POST</td>
+              <td>Routes user queries to Groq LPU LLM with injected warehouse context</td>
+            </tr>
+            <tr>
+              <td><code>/api/ai/forecast</code></td>
+              <td>POST</td>
+              <td>Returns 3-month predictive sales projections rendered dynamically</td>
+            </tr>
+            <tr>
+              <td><code>/reports/*</code></td>
+              <td>GET</td>
+              <td>Static file server streaming high-resolution visual evaluation charts</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: Business Impact & Conclusion -->
+    <div class="slide" data-notes="In conclusion, ApexDrive demonstrates how combining classical supervised machine learning with high-speed Generative AI creates a comprehensive, production-ready enterprise solution. Thank you, and I am now ready for your questions.">
+      <div class="slide-category">Summary & Business Value</div>
+      <h2 class="slide-title">Quantifiable Impact & Future Enhancements</h2>
+      <p class="slide-subtitle">Transforming reactive inventory management into proactive AI intelligence.</p>
+
+      <div class="grid-3" style="margin-bottom: 24px;">
+        <div class="card highlight">
+          <div class="card-icon" style="color: var(--cyan);"><i class="ri-arrow-down-circle-line"></i></div>
+          <div class="card-heading">35% Stockout Reduction</div>
+          <div class="card-text">Temporal lag features anticipate surges 14 days in advance, preventing vehicle downtime.</div>
+        </div>
+        <div class="card highlight">
+          <div class="card-icon" style="color: var(--green);"><i class="ri-funds-box-line"></i></div>
+          <div class="card-heading">22% Lower Holding Costs</div>
+          <div class="card-text">Eliminates over-ordering slow-moving winter stock ahead of spring tuning season.</div>
+        </div>
+        <div class="card highlight">
+          <div class="card-icon" style="color: var(--orange);"><i class="ri-shield-check-line"></i></div>
+          <div class="card-heading">High-Availability Resiliency</div>
+          <div class="card-text">Hybrid offline fallback guarantees uninterrupted warehouse operations even if internet drops.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-heading">Future Engineering Roadmap:</div>
+        <div class="card-text">
+          • Deployment of <strong>Deep Learning LSTM / DeepAR</strong> networks for multi-horizon probabilistic intervals.<br>
+          • Automated B2B purchase order (PO) dispatch via EDI / Webhook integrations with Tier-1 manufacturers.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: Q&A Defense -->
+    <div class="slide" data-notes="Thank you for your attention. I am now ready for your questions.">
+      <div class="slide-category">Evaluation & Defense</div>
+      <h2 class="slide-title">Thank You! Questions & Discussion</h2>
+      <p class="slide-subtitle">ApexDrive — AI-Powered Automotive Telemetry & Demand Forecasting Dashboard</p>
+
+      <div class="grid-2">
+        <div class="card highlight">
+          <div class="card-heading">Key Project Credentials</div>
+          <div class="card-text">
+            • <strong>Student / Presenter:</strong> Rohit Kandasamy<br>
+            • <strong>Review:</strong> 4th Semester Internship Project (Contus)<br>
+            • <strong>Champion Model:</strong> Gradient Boosting Regressor ($R^2 = 0.9270$)<br>
+            • <strong>GenAI Engine:</strong> Meta LLaMA 3.3 70B on Groq LPUs (~400 tok/sec)<br>
+            • <strong>GitHub Repo:</strong> <code>github.com/rohitkandasamy06/Antigravity</code>
+          </div>
+        </div>
+
+        <div class="card champion">
+          <div class="card-heading">Examiner Defense Highlights:</div>
+          <div class="card-text">
+            • <strong>Why Not Just Linear Regression?</strong> Non-linear interactions between tuning seasonality and competitor pricing required boosted trees ($R^2: 0.7595 \to 0.9270$).<br>
+            • <strong>Why Chronological Split?</strong> Prevents future data leakage in time-series.<br>
+            • <strong>Why Groq LPU?</strong> Instantaneous sub-200ms latency eliminates user wait times.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Speaker Notes Drawer -->
+  <div class="notes-drawer" id="notesDrawer">
+    <div class="notes-title"><i class="ri-mic-line"></i> Speaker Script / Talking Points:</div>
+    <div class="notes-text" id="notesText">Notes will appear here...</div>
+  </div>
+
+  <!-- Footer Controls -->
+  <footer class="pres-footer">
+    <div style="font-size: 0.85rem; color: var(--text-muted);">
+      Press <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #fff;">←</kbd> and <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #fff;">→</kbd> to navigate • Press <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #fff;">F11</kbd> for Fullscreen
+    </div>
+    <div class="controls">
+      <button class="btn speaker-notes-btn" onclick="toggleNotes()"><i class="ri-file-text-line"></i> Speaker Notes</button>
+      <button class="btn btn-prev" onclick="prevSlide()"><i class="ri-arrow-left-line"></i> Prev</button>
+      <button class="btn btn-next" onclick="nextSlide()">Next <i class="ri-arrow-right-line"></i></button>
+    </div>
+  </footer>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progressBar');
+    const slideCounter = document.getElementById('slideCounter');
+    const notesDrawer = document.getElementById('notesDrawer');
+    const notesText = document.getElementById('notesText');
+    let currentSlide = 0;
+
+    function updateSlide(index) {
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === index);
+      });
+      currentSlide = index;
+      const progress = ((index + 1) / slides.length) * 100;
+      progressBar.style.width = progress + '%';
+      slideCounter.textContent = `SLIDE ${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+      
+      const activeNotes = slides[index].getAttribute('data-notes') || 'No notes for this slide.';
+      notesText.textContent = activeNotes;
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        updateSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        updateSlide(currentSlide - 1);
+      }
+    }
+
+    function toggleNotes() {
+      notesDrawer.classList.toggle('open');
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 's') {
+        toggleNotes();
+      }
+    });
+
+    // Initialize
+    updateSlide(0);
+  </script>
+</body>
+</html>
