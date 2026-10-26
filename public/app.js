@@ -322,6 +322,8 @@ function renderViewContent(pageId) {
 
     case 'forecast':
       renderForecastBaseChart();
+      loadMlDatasetPreview();
+      runLiveMlPrediction();
       break;
   }
 }
@@ -2085,4 +2087,69 @@ function showToast(msg) {
     }, 3200);
   }
 }
+
+// ─── Interactive ML Prediction & Dataset Explorer ──────────────────────────────
+async function runLiveMlPrediction() {
+  const category = document.getElementById('mlInputCategory')?.value || 'Braking & Rotors';
+  const hub = document.getElementById('mlInputHub')?.value || 'HUB-DTW';
+  const unit_price = Number(document.getElementById('mlInputPrice')?.value || 650);
+  const discount_pct = Number(document.getElementById('mlInputDiscount')?.value || 10);
+  const lead_time_days = Number(document.getElementById('mlInputLeadTime')?.value || 2);
+  const seasonal_index = Number(document.getElementById('mlInputSeason')?.value || 1.15);
+  const competitor_price_ratio = Number(document.getElementById('mlInputComp')?.value || 1.05);
+
+  try {
+    const res = await fetch('/api/ml/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        category,
+        hub,
+        unit_price,
+        discount_pct,
+        lead_time_days,
+        seasonal_index,
+        competitor_price_ratio
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const unitsEl = document.getElementById('mlOutputUnits');
+      const revEl = document.getElementById('mlOutputRevenue');
+      if (unitsEl) unitsEl.textContent = data.predicted_units;
+      if (revEl) revEl.textContent = `Est. Revenue: $${Number(data.estimated_revenue).toLocaleString()}`;
+    }
+  } catch (err) {
+    console.warn('ML Predict error:', err);
+  }
+}
+
+async function loadMlDatasetPreview() {
+  const tbody = document.getElementById('csvPreviewBody');
+  if (!tbody) return;
+
+  try {
+    const res = await fetch('/api/ml/dataset');
+    const data = await res.json();
+    if (data.success && data.sampleRows && data.sampleRows.length > 0) {
+      tbody.innerHTML = data.sampleRows.map(row => `
+        <tr class="border-b border-white/5 hover:bg-white/5">
+          <td class="p-2.5 font-mono text-slate-300">${row.date || ''}</td>
+          <td class="p-2.5 font-bold text-cyan-300">${row.hub_code || ''}</td>
+          <td class="p-2.5">${row.category || ''}</td>
+          <td class="p-2.5 font-mono">$${Number(row.unit_price || 0).toFixed(2)}</td>
+          <td class="p-2.5 font-mono text-amber-400">${row.discount_pct || 0}%</td>
+          <td class="p-2.5 font-mono">${row.lead_time_days || 0}d</td>
+          <td class="p-2.5 font-mono">${Number(row.competitor_price_ratio || 1).toFixed(2)}x</td>
+          <td class="p-2.5 font-mono text-emerald-400">${Number(row.seasonal_index || 1).toFixed(2)}x</td>
+          <td class="p-2.5 font-mono font-bold text-cyan-300">${row.units_sold || 0}</td>
+          <td class="p-2.5 font-mono font-bold text-emerald-400">$${Number(row.revenue || 0).toLocaleString()}</td>
+        </tr>
+      `).join('');
+    }
+  } catch (err) {
+    console.warn('Dataset preview load error:', err);
+  }
+}
+
 

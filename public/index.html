@@ -667,6 +667,269 @@
               </div>
             </div>
           </div>
+
+          <!-- ═══════ 9B. INTERACTIVE ML PREDICTION SIMULATOR (INPUT PARAMETERS) ═══════ -->
+          <div class="card mb-6 border border-cyan-500/30">
+            <div class="card-header flex flex-wrap items-center justify-between gap-4">
+              <div class="card-title-group">
+                <h3><i class="ri-sound-module-fill text-apex-orange"></i> Live ML Prediction Simulator (Model Input Parameters)</h3>
+                <p class="card-desc">Adjust operational and economic input features to generate live inferences via trained Gradient Boosting model (R² = 0.9270)</p>
+              </div>
+              <button class="btn-primary" onclick="runLiveMlPrediction()"><i class="ri-play-circle-fill"></i> Run ML Model Inference</button>
+            </div>
+            <div class="card-body">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <!-- Input 1: Category -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Automotive Category</label>
+                  <select id="mlInputCategory" class="w-full bg-slate-950/80 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-cyan-400 outline-none" onchange="runLiveMlPrediction()">
+                    <option value="Braking & Rotors" selected>Braking & Rotors ($650 base)</option>
+                    <option value="Turbo & Powertrain">Turbo & Powertrain ($1,450 base)</option>
+                    <option value="Suspension & Steering">Suspension & Steering ($1,100 base)</option>
+                    <option value="Electrical & Ignition">Electrical & Ignition ($320 base)</option>
+                    <option value="Wheels & Track Tires">Wheels & Track Tires ($880 base)</option>
+                    <option value="Performance Exhausts">Performance Exhausts ($920 base)</option>
+                    <option value="Fluids & Race Lubricants">Fluids & Race Lubricants ($140 base)</option>
+                    <option value="Engine Internals">Engine Internals ($1,850 base)</option>
+                  </select>
+                </div>
+
+                <!-- Input 2: Distribution Hub -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Distribution Hub</label>
+                  <select id="mlInputHub" class="w-full bg-slate-950/80 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:border-cyan-400 outline-none" onchange="runLiveMlPrediction()">
+                    <option value="HUB-DTW" selected>HUB-DTW (Detroit Central 1.45x)</option>
+                    <option value="HUB-DFW">HUB-DFW (Dallas Depot 1.20x)</option>
+                    <option value="HUB-LAX">HUB-LAX (Los Angeles Speedshop 1.30x)</option>
+                    <option value="HUB-ATL">HUB-ATL (Atlanta Regional 1.10x)</option>
+                    <option value="HUB-FRA">HUB-FRA (Frankfurt Euro-Hub 0.90x)</option>
+                  </select>
+                </div>
+
+                <!-- Input 3: Unit Price -->
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Unit Price ($)</label>
+                    <span id="valUnitPrice" class="text-xs font-mono font-bold text-cyan-400">$650</span>
+                  </div>
+                  <input type="range" id="mlInputPrice" min="100" max="2500" step="50" value="650" class="w-full accent-cyan-400 cursor-pointer" oninput="document.getElementById('valUnitPrice').textContent = '$' + this.value; runLiveMlPrediction();" />
+                </div>
+
+                <!-- Input 4: Discount % -->
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Discount (%)</label>
+                    <span id="valDiscount" class="text-xs font-mono font-bold text-amber-400">10%</span>
+                  </div>
+                  <input type="range" id="mlInputDiscount" min="0" max="25" step="5" value="10" class="w-full accent-amber-400 cursor-pointer" oninput="document.getElementById('valDiscount').textContent = this.value + '%'; runLiveMlPrediction();" />
+                </div>
+
+                <!-- Input 5: Warehouse Lead Time -->
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Transit Lead Time (Days)</label>
+                    <span id="valLeadTime" class="text-xs font-mono font-bold text-slate-200">2 Days</span>
+                  </div>
+                  <input type="range" id="mlInputLeadTime" min="1" max="5" step="1" value="2" class="w-full accent-slate-400 cursor-pointer" oninput="document.getElementById('valLeadTime').textContent = this.value + ' Days'; runLiveMlPrediction();" />
+                </div>
+
+                <!-- Input 6: Seasonal Surge Factor -->
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Seasonal Surge Index</label>
+                    <span id="valSeason" class="text-xs font-mono font-bold text-emerald-400">1.15x (Peak)</span>
+                  </div>
+                  <input type="range" id="mlInputSeason" min="0.75" max="1.50" step="0.05" value="1.15" class="w-full accent-emerald-400 cursor-pointer" oninput="document.getElementById('valSeason').textContent = this.value + 'x'; runLiveMlPrediction();" />
+                </div>
+
+                <!-- Input 7: Competitor Price Ratio -->
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Competitor Price Ratio</label>
+                    <span id="valCompRatio" class="text-xs font-mono font-bold text-cyan-400">1.05x</span>
+                  </div>
+                  <input type="range" id="mlInputComp" min="0.85" max="1.25" step="0.05" value="1.05" class="w-full accent-cyan-400 cursor-pointer" oninput="document.getElementById('valCompRatio').textContent = this.value + 'x'; runLiveMlPrediction();" />
+                </div>
+
+                <!-- Live Result Display Box -->
+                <div class="p-4 rounded-xl bg-gradient-to-br from-cyan-950/40 via-slate-950/80 to-slate-900 border border-cyan-500/40 flex flex-col justify-center">
+                  <div class="text-[11px] uppercase tracking-wider text-slate-400 font-bold mb-1">Live Model Output:</div>
+                  <div class="flex items-baseline gap-2">
+                    <span id="mlOutputUnits" class="text-2xl font-black font-mono text-cyan-300">48</span>
+                    <span class="text-xs text-slate-400 font-semibold">predicted units/day</span>
+                  </div>
+                  <div class="text-xs text-amber-400 font-mono font-bold mt-1" id="mlOutputRevenue">Est. Revenue: $28,080</div>
+                  <div class="text-[10px] text-emerald-400 font-semibold mt-1"><i class="ri-checkbox-circle-fill"></i> Model R²: 0.9270 (High Confidence)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════ 9C. ALGORITHM ACCURACY & BENCHMARK SCOREBOARD ═══════ -->
+          <div class="card mb-6">
+            <div class="card-header flex flex-wrap items-center justify-between gap-4">
+              <div class="card-title-group">
+                <h3><i class="ri-trophy-line text-emerald-400"></i> Supervised Machine Learning Benchmark Scoreboard</h3>
+                <p class="card-desc">Chronological validation and test horizon performance metrics across 3 algorithm paradigms</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <a href="/reports/model_comparison_metrics.png" target="_blank" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1 transition">
+                  <i class="ri-line-chart-line"></i> View Comparison Chart
+                </a>
+                <a href="/reports/eda_correlation_heatmap.png" target="_blank" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1 transition">
+                  <i class="ri-grid-fill"></i> View Correlation Heatmap
+                </a>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table-dark w-full text-xs">
+                  <thead>
+                    <tr class="text-left text-slate-400 border-b border-white/10">
+                      <th class="p-3">Model Paradigm</th>
+                      <th class="p-3">Algorithm</th>
+                      <th class="p-3">Validation R²</th>
+                      <th class="p-3">Validation RMSE</th>
+                      <th class="p-3">Validation MAE</th>
+                      <th class="p-3">Unseen Test R²</th>
+                      <th class="p-3">Unseen Test MAPE</th>
+                      <th class="p-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                      <td class="p-3 font-semibold text-slate-300">Baseline Linear</td>
+                      <td class="p-3 font-mono text-cyan-300">Ridge Regression (L2)</td>
+                      <td class="p-3 font-mono">0.7595</td>
+                      <td class="p-3 font-mono">9.75 units</td>
+                      <td class="p-3 font-mono">8.00 units</td>
+                      <td class="p-3 font-mono">0.7410</td>
+                      <td class="p-3 font-mono text-amber-400">12.79%</td>
+                      <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">Baseline</span></td>
+                    </tr>
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                      <td class="p-3 font-semibold text-slate-300">Ensemble Bagging</td>
+                      <td class="p-3 font-mono text-cyan-300">Random Forest (120 Trees)</td>
+                      <td class="p-3 font-mono">0.9072</td>
+                      <td class="p-3 font-mono">6.06 units</td>
+                      <td class="p-3 font-mono">4.54 units</td>
+                      <td class="p-3 font-mono">0.8590</td>
+                      <td class="p-3 font-mono text-emerald-400">6.26%</td>
+                      <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-cyan-900/40 text-cyan-300 border border-cyan-500/30">Competitive</span></td>
+                    </tr>
+                    <tr class="bg-emerald-950/20 border-b border-emerald-500/30 font-bold">
+                      <td class="p-3 text-emerald-300">Ensemble Boosting</td>
+                      <td class="p-3 font-mono text-emerald-300">Gradient Boosting Regressor</td>
+                      <td class="p-3 font-mono text-emerald-400">0.9270</td>
+                      <td class="p-3 font-mono text-emerald-400">5.38 units</td>
+                      <td class="p-3 font-mono text-emerald-400">4.13 units</td>
+                      <td class="p-3 font-mono text-emerald-400">0.8746</td>
+                      <td class="p-3 font-mono text-emerald-400">6.74%</td>
+                      <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/50">🏆 Champion</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════ 9D. TRAINING DATASET (CSV) EXPLORER ═══════ -->
+          <div class="card mb-6">
+            <div class="card-header flex flex-wrap items-center justify-between gap-4">
+              <div class="card-title-group">
+                <h3><i class="ri-file-excel-2-line text-emerald-400"></i> Training Dataset Explorer (automotive_parts_sales.csv)</h3>
+                <p class="card-desc">Ground-truth historical records used for supervised model training (29,240 rows × 13 features)</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-400 font-mono">29,240 Samples across 5 Hubs</span>
+                <a href="/api/ml/download-csv" target="_blank" class="btn-primary text-xs flex items-center gap-1.5 py-1.5 px-3">
+                  <i class="ri-download-cloud-2-line"></i> Download Full CSV (2.3 MB)
+                </a>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive max-h-80 overflow-y-auto rounded-lg border border-white/5">
+                <table class="table-dark w-full text-xs" id="csvPreviewTable">
+                  <thead>
+                    <tr class="text-left text-slate-400 bg-slate-950/80 sticky top-0 border-b border-white/10">
+                      <th class="p-2.5">Date</th>
+                      <th class="p-2.5">Hub</th>
+                      <th class="p-2.5">Category</th>
+                      <th class="p-2.5">Unit Price</th>
+                      <th class="p-2.5">Discount</th>
+                      <th class="p-2.5">Lead Time</th>
+                      <th class="p-2.5">Comp Ratio</th>
+                      <th class="p-2.5">Season Index</th>
+                      <th class="p-2.5">Units Sold</th>
+                      <th class="p-2.5">Revenue ($)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="csvPreviewBody">
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                      <td class="p-2.5 font-mono text-slate-300">2024-01-01</td>
+                      <td class="p-2.5 font-bold text-cyan-300">HUB-DTW</td>
+                      <td class="p-2.5">Braking & Rotors</td>
+                      <td class="p-2.5 font-mono">$641.85</td>
+                      <td class="p-2.5 font-mono text-amber-400">20%</td>
+                      <td class="p-2.5 font-mono">3 days</td>
+                      <td class="p-2.5 font-mono">1.076x</td>
+                      <td class="p-2.5 font-mono text-emerald-400">0.875x</td>
+                      <td class="p-2.5 font-mono font-bold text-cyan-300">26</td>
+                      <td class="p-2.5 font-mono font-bold text-emerald-400">$13,350.48</td>
+                    </tr>
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                      <td class="p-2.5 font-mono text-slate-300">2024-01-01</td>
+                      <td class="p-2.5 font-bold text-cyan-300">HUB-DFW</td>
+                      <td class="p-2.5">Turbo & Powertrain</td>
+                      <td class="p-2.5 font-mono">$1,482.10</td>
+                      <td class="p-2.5 font-mono text-amber-400">10%</td>
+                      <td class="p-2.5 font-mono">2 days</td>
+                      <td class="p-2.5 font-mono">1.025x</td>
+                      <td class="p-2.5 font-mono text-emerald-400">0.875x</td>
+                      <td class="p-2.5 font-mono font-bold text-cyan-300">14</td>
+                      <td class="p-2.5 font-mono font-bold text-emerald-400">$18,674.46</td>
+                    </tr>
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                      <td class="p-2.5 font-mono text-slate-300">2024-01-01</td>
+                      <td class="p-2.5 font-bold text-cyan-300">HUB-LAX</td>
+                      <td class="p-2.5">Suspension & Steering</td>
+                      <td class="p-2.5 font-mono">$1,095.40</td>
+                      <td class="p-2.5 font-mono text-amber-400">15%</td>
+                      <td class="p-2.5 font-mono">1 day</td>
+                      <td class="p-2.5 font-mono">1.110x</td>
+                      <td class="p-2.5 font-mono text-emerald-400">0.875x</td>
+                      <td class="p-2.5 font-mono font-bold text-cyan-300">21</td>
+                      <td class="p-2.5 font-mono font-bold text-emerald-400">$19,552.89</td>
+                    </tr>
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                      <td class="p-2.5 font-mono text-slate-300">2024-01-01</td>
+                      <td class="p-2.5 font-bold text-cyan-300">HUB-ATL</td>
+                      <td class="p-2.5">Electrical & Ignition</td>
+                      <td class="p-2.5 font-mono">$318.50</td>
+                      <td class="p-2.5 font-mono text-amber-400">5%</td>
+                      <td class="p-2.5 font-mono">2 days</td>
+                      <td class="p-2.5 font-mono">0.985x</td>
+                      <td class="p-2.5 font-mono text-emerald-400">0.875x</td>
+                      <td class="p-2.5 font-mono font-bold text-cyan-300">32</td>
+                      <td class="p-2.5 font-mono font-bold text-emerald-400">$9,682.40</td>
+                    </tr>
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                      <td class="p-2.5 font-mono text-slate-300">2024-01-01</td>
+                      <td class="p-2.5 font-bold text-cyan-300">HUB-FRA</td>
+                      <td class="p-2.5">Fluids & Race Lubricants</td>
+                      <td class="p-2.5 font-mono">$138.90</td>
+                      <td class="p-2.5 font-mono text-amber-400">10%</td>
+                      <td class="p-2.5 font-mono">4 days</td>
+                      <td class="p-2.5 font-mono">1.040x</td>
+                      <td class="p-2.5 font-mono text-emerald-400">0.875x</td>
+                      <td class="p-2.5 font-mono font-bold text-cyan-300">45</td>
+                      <td class="p-2.5 font-mono font-bold text-emerald-400">$5,625.45</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- ═══════ 10. WHO WE ARE & WHAT WE DO (ABOUT US) ═══════ -->
