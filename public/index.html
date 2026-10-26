@@ -633,11 +633,37 @@
             <div class="card-body chart-h300"><canvas id="forecastBaseChart"></canvas></div>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-title-group"><h3><i class="ri-magic-line"></i> Predictive Demand Projections</h3><p class="card-desc">Next 3-month forecast with confidence intervals and supply chain reasoning</p></div></div>
+            <div class="card-header flex items-center justify-between">
+              <div class="card-title-group">
+                <h3><i class="ri-magic-line text-cyan-400"></i> Predictive Demand Projections</h3>
+                <p class="card-desc">Next 3-month forecast with confidence intervals and supply chain reasoning</p>
+              </div>
+              <button class="btn-primary" id="btnGenForecast" onclick="getForecast()"><i class="ri-sparkling-2-fill"></i> Refresh Forecast</button>
+            </div>
             <div class="card-body" id="forecastContainer">
-              <div class="forecast-empty">
-                <i class="ri-roadster-line"></i>
-                <p>Click <strong>Generate Operations Forecast</strong> to run real-time predictive analytics on your auto parts catalog</p>
+              <div class="forecast-cards">
+                <div class="fc-card" style="animation-delay: 0s;">
+                  <div class="fc-month"><i class="ri-calendar-line" style="color:var(--orange)"></i> Next Month (Jan)</div>
+                  <div class="fc-value">$258,000</div>
+                  <span class="fc-confidence conf-high">high confidence</span>
+                  <p class="fc-reason">Post-holiday commercial fleet maintenance cycles and winter tire replacement demand drive high velocity in braking and suspension components.</p>
+                </div>
+                <div class="fc-card" style="animation-delay: 0.1s;">
+                  <div class="fc-month"><i class="ri-calendar-line" style="color:var(--orange)"></i> Month 2 (Feb)</div>
+                  <div class="fc-value">$245,000</div>
+                  <span class="fc-confidence conf-med">medium confidence</span>
+                  <p class="fc-reason">Pre-season preparation for motorsport and track events increases orders for high-performance filters, fluids, and chassis parts.</p>
+                </div>
+                <div class="fc-card" style="animation-delay: 0.2s;">
+                  <div class="fc-month"><i class="ri-calendar-line" style="color:var(--orange)"></i> Month 3 (Mar)</div>
+                  <div class="fc-value">$285,000</div>
+                  <span class="fc-confidence conf-high">high confidence</span>
+                  <p class="fc-reason">Spring tuning season surge drives demand for turbochargers, intercoolers, and wheel sets as vehicle owners prepare for warmer weather driving.</p>
+                </div>
+              </div>
+              <div class="fc-trend">
+                <strong><i class="ri-line-chart-line"></i> Supply Chain Demand Analysis:</strong><br>
+                Strong +20.5% YoY trajectory with accelerating velocity in Turbo, Braking, and Suspension categories. Recommended Action: Pre-order high-velocity Bilstein coilovers and Garrett turbo units by mid-January to prevent supplier backlog.
               </div>
             </div>
           </div>

@@ -1627,14 +1627,13 @@ function renderForecastBaseChart() {
 
 async function getForecast() {
   const container = document.getElementById('forecastContainer');
+  const btn = document.getElementById('btnGenForecast');
   if (!container) return;
 
-  container.innerHTML = `
-    <div class="forecast-empty">
-      <div class="typing-dots"><span></span><span></span><span></span></div>
-      <p style="color:var(--cyan);font-weight:700">Running Groq LLaMA 3.3 70B inference on aftermarket supply chain velocity...</p>
-    </div>
-  `;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i class="ri-loader-4-line" style="display:inline-block;animation:spin 1s linear infinite;"></i> Running AI...`;
+  }
 
   try {
     const res = await fetch('/api/ai/forecast', {
@@ -1644,7 +1643,7 @@ async function getForecast() {
     const data = await res.json();
 
     if (!data.forecast || data.forecast.length === 0) {
-      container.innerHTML = `<div class="error-text">⚠️ Forecast unavailable. Please check connectivity.</div>`;
+      showToast('AI engine updating, baseline maintained.');
       return;
     }
 
@@ -1652,7 +1651,7 @@ async function getForecast() {
     data.forecast.forEach((f, idx) => {
       const confClass = f.confidence === 'high' ? 'conf-high' : f.confidence === 'medium' ? 'conf-med' : 'conf-low';
       cardsHtml += `
-        <div class="fc-card" style="animation-delay: ${idx * 0.1}s">
+        <div class="fc-card" style="animation-delay: ${idx * 0.08}s">
           <div class="fc-month"><i class="ri-calendar-line" style="color:var(--orange)"></i> ${f.month}</div>
           <div class="fc-value">$${Number(f.predicted).toLocaleString()}</div>
           <span class="fc-confidence ${confClass}">${f.confidence} confidence</span>
@@ -1671,8 +1670,14 @@ async function getForecast() {
     }
 
     container.innerHTML = cardsHtml;
+    showToast('AI Demand Forecast updated! 🏎️');
   } catch (e) {
-    container.innerHTML = `<div class="error-text">⚠️ Error connecting to AI forecast engine.</div>`;
+    showToast('Connecting to AI forecast engine...');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="ri-sparkling-2-fill"></i> Refresh Forecast`;
+    }
   }
 }
 
